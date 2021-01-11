@@ -27,6 +27,7 @@ Character::Character(Name name, float x, float y, int size, QObject *parent) : Q
     speed = 2;
     movement = Movement::IDLE_DOWN;
     bombs = 1;
+    isAlive = true;
 }
 
 void Character::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget * widget)
@@ -70,12 +71,17 @@ void Character::nextFrame()
     case Movement::RIGHT:
         calcFrame(size*5, false);
         break;
+    case Movement::DEAD:
+        calcFrame(size*8,true);
+        break;
     }
     this->update(0,0,size,size);
 }
 
 void Character::calcFrame(int frameY, bool idle)
 {
+    if(frameY != size*8)
+    {
     if(idle == true)
     {
         currentFrameY = frameY;
@@ -104,6 +110,15 @@ void Character::calcFrame(int frameY, bool idle)
         else{
             currentFrameY = frameY - size*4;
             currentFrameX = 0;
+        }
+    }
+    }
+    else{
+        isAlive = false;
+        currentFrameY = frameY;
+        if(currentFrameX != 128)
+        {
+            currentFrameX +=64;
         }
     }
 }
@@ -190,20 +205,22 @@ int Character::getBombs()
 
 bool Character::bombCollision(float x, float y, float radius)
 {
-    float top = pos().x()+12;
-    float bottom = pos().y()+25;
-    float left = pos().y()+5;
-    float right = pos().x()+9;
+    float top = pos().y()+9;
+    float bottom = pos().y()+60;
+    float left = pos().x()+24;
+    float right = pos().x()+42;
     float dis1 = sqrt((x-left)*(x-left) + (y-top)*(y-top));
     float dis2 = sqrt((x-left)*(x-left) + (y-bottom)*(y-bottom));
     float dis3 = sqrt((x-right)*(x-right) + (y-top)*(y-top));
     float dis4 = sqrt((x-right)*(x-right) + (y-bottom)*(y-bottom));
     if(dis1 <= radius || dis2 <= radius || dis3 <= radius || dis4 <= radius)
     {
-        qDebug()<<"KOLIZJA Z BOMBA!";
-        qDebug() <<pos().x();
-        qDebug() <<pos().y();
         return true;
     }
     return false;
+}
+
+bool Character::getIsAlive()
+{
+    return isAlive;
 }

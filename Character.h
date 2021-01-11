@@ -15,7 +15,7 @@
 
 enum class Name {PENGUIN_WELDER};
 
-enum class Movement{UP, LEFT, DOWN, RIGHT, IDLE_UP, IDLE_LEFT, IDLE_RIGHT, IDLE_DOWN};
+enum class Movement{UP, LEFT, DOWN, RIGHT, IDLE_UP, IDLE_LEFT, IDLE_RIGHT, IDLE_DOWN, DEAD};
 
 
 
@@ -33,6 +33,7 @@ private:
     bool step;
     float speed;
     int bombs;
+    bool isAlive;
 public:
     explicit Character(QObject *parent = 0);
     explicit Character(Name name, float x = 0, float y = 0, int size = 64, QObject *parent = 0);
@@ -43,6 +44,7 @@ public:
     void setBombs(int b);
     int getBombs();
     bool bombCollision(float bombX, float bombY, float radius);
+    bool getIsAlive();
 public slots:
     void move(std::vector<Wall*> * walls);
 

@@ -15,6 +15,7 @@ public:
     explicit Bomb(QObject *parent = 0);
     explicit Bomb(Character & character, float x, float y,QObject *parent = 0);
     bool ifExplodes();
+    bool ifToDeleted();
 private slots:
     void nextFrame();
 
@@ -27,6 +28,8 @@ private:
     int currentFrameX;
     int currentFrameY;
     float explosionRadius;
+    bool toDeleted;
+
 };
 
 #endif // BOMB_H

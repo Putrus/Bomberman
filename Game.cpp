@@ -42,6 +42,8 @@ void Game::mousePressEvent(QMouseEvent *ev)
 
 void Game::keyPressEvent(QKeyEvent *event)
 {
+    if(character->getIsAlive())
+    {
     switch(event->key())
     {
     case Qt::Key_W:
@@ -57,13 +59,15 @@ void Game::keyPressEvent(QKeyEvent *event)
         character->setMovement(Movement::RIGHT);
         break;
     }
-
+    }
 
 }
 
 
 void Game::keyReleaseEvent(QKeyEvent *event)
 {
+    if(character->getIsAlive())
+    {
     switch(event->key())
     {
     case Qt::Key_W:
@@ -95,34 +99,25 @@ void Game::keyReleaseEvent(QKeyEvent *event)
         }
         break;
     }
+    }
 }
 
 
 
 void Game::checkBombCollisions()
 {
-    for(auto it = bombs->begin();it != bombs->end(); ++it)
-    {
-        if((*it)->pos().x() == -5)
+    for (auto it = bombs->begin(); it != bombs->end(); it++) {
+        if((*it)[0].ifToDeleted() == true)
         {
-            bombs->erase(it);
-            delete *it;
-            qDebug() << bombs->size();
-
-            continue;
+            delete (*it);
+            *it = nullptr;
+            bombs->erase(it--);
         }
         else{
-        float x = (*it)->pos().x() + 63;
-        float y = (*it)->pos().x() + 72;
-        float top = character->pos().x()+12;
-        float bottom = character->pos().y()+25;
-        float left = character->pos().y()+5;
-        float right = character->pos().x()+9;
-        if(character->bombCollision(x,y,16))
-        {
-
-        }
-
+            if((*it)->ifExplodes() && character->bombCollision((*it)->pos().x()+63, (*it)->pos().y()+72, 26))
+            {
+                character->setMovement(Movement::DEAD);
+            }
         }
     }
 }

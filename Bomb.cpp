@@ -14,7 +14,8 @@ Bomb::Bomb(Character & character, float x, float y, QObject *parent) : QObject(p
     setPos(x,y);
     this->character = &character;
     this->character->setBombs(this->character->getBombs()-1);
-    explosionRadius = 16;
+    explosionRadius = 26;
+    toDeleted = false;
 }
 
 
@@ -38,14 +39,13 @@ void Bomb::nextFrame()
     if(currentFrameX == 1152 && currentFrameY == 128)
     {
         character->setBombs(character->getBombs()+1);
-        delete this;
+        toDeleted = true;
         return;
     }
     if(currentFrameX == 1152)
     {
         currentFrameX = 0;
         currentFrameY += 128;
-        setZValue(6);
     }
     this->update(0,0,128,128);
 }
@@ -59,3 +59,7 @@ bool Bomb::ifExplodes()
     return false;
 }
 
+bool Bomb::ifToDeleted()
+{
+    return toDeleted;
+}
