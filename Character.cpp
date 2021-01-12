@@ -22,12 +22,13 @@ Character::Character(Name name, float x, float y, int size, QObject *parent) : Q
     currentFrameY = 0;
     animationTimer = new QTimer();
     connect(animationTimer, &QTimer::timeout, this, &Character::nextFrame);
-    animationTimer->start(200);
+    animationTimer->start(100);
     step = 0;
     speed = 2;
     movement = Movement::IDLE_DOWN;
     bombs = 1;
     isAlive = true;
+    score = 0;
 }
 
 void Character::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget * widget)
@@ -80,6 +81,7 @@ void Character::nextFrame()
 
 void Character::calcFrame(int frameY, bool idle)
 {
+    //czy postac zyje
     if(frameY != size*8)
     {
     if(idle == true)
@@ -122,7 +124,7 @@ void Character::calcFrame(int frameY, bool idle)
         }
     }
 }
-void Character::move(std::vector<Wall*> * walls)
+void Character::move(std::vector<bmb::Wall*> * walls)
 {
     switch(movement)
     {
@@ -142,6 +144,8 @@ void Character::move(std::vector<Wall*> * walls)
             if(!allCollisions(walls, 0,speed))
             setPos(pos().x(),pos().y()+speed);
         break;
+        default:
+        break;
     }
 }
 
@@ -158,7 +162,7 @@ Movement Character::getMovement()
     return this->movement;
 }
 
-bool Character::collision(Wall * wall, float speedX, float speedY)
+bool Character::collision(bmb::Wall * wall, float speedX, float speedY)
 {
     float top = getBounds().top();
     float bottom = getBounds().bottom();
@@ -175,7 +179,7 @@ bool Character::collision(Wall * wall, float speedX, float speedY)
     return false;
 }
 
-bool Character::allCollisions(std::vector<Wall*> * walls, float speedX, float speedY)
+bool Character::allCollisions(std::vector<bmb::Wall*> * walls, float speedX, float speedY)
 {
     for(int i=0;i<walls->size();i++)
     {
@@ -223,4 +227,13 @@ bool Character::bombCollision(float x, float y, float radius)
 bool Character::getIsAlive()
 {
     return isAlive;
+}
+
+void Character::setSpeed(float v)
+{
+    this->speed = v;
+}
+float Character::getSpeed()
+{
+    return this->speed;
 }

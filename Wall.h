@@ -3,19 +3,18 @@
 #include <QObject>
 #include <QGraphicsItem>
 #include <QPainter>
-class Wall : public QObject, public QGraphicsItem
+#include "Object.h"
+namespace bmb
+{
+class Wall : public Object
 {
     Q_OBJECT
-private:
-    QPixmap * sprite;
 public:
-    Wall(QObject *parent=0);
-    Wall(float x, float y, QObject *parent = 0);
+    Wall(QString name, QPointF pos = QPointF(0.f, 0.f), QRectF bounds = QRectF(0.f, 0.f, 0.f, 0.f), bool isBreakable = false, Object *parent = 0);
 private:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget * widget);
-    QRectF boundingRect() const;
+    bool isBreakable;
 public:
-    QRectF getBounds();
+    void nextFrame();
 };
-
+}
 #endif // WALL_H

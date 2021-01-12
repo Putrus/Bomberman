@@ -12,6 +12,7 @@ SOURCES += \
     Bomb.cpp \
     Character.cpp \
     Game.cpp \
+    Object.cpp \
     Wall.cpp \
     main.cpp
 
@@ -19,9 +20,12 @@ HEADERS += \
     Bomb.h \
     Character.h \
     Game.h \
+    Object.h \
     Wall.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+FORMS +=

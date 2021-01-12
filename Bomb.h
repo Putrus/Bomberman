@@ -4,32 +4,22 @@
 #include <QGraphicsItem>
 #include <QTimer>
 #include <QPainter>
+#include "Object.h"
 #include "Character.h"
-class Bomb : public QObject, public QGraphicsItem
+namespace bmb{
+class Bomb : public Object
 {
     Q_OBJECT
 private:
     //postac do ktorej nalezy bomba
     Character * character;
 public:
-    explicit Bomb(QObject *parent = 0);
-    explicit Bomb(Character & character, float x, float y,QObject *parent = 0);
+    explicit Bomb(Character & character, QString name = "bomb", QPointF pos = QPointF(-420.69f, -420.69f), QRectF bounds = QRectF(0.f, 0.f, 0.f, 0.f), Object *parent = 0);
     bool ifExplodes();
-    bool ifToDeleted();
-private slots:
-    void nextFrame();
-
 private:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget * widget);
-    QRectF boundingRect() const;
-private:
-    QTimer *animationTimer;
-    QPixmap *spriteImage;
-    int currentFrameX;
-    int currentFrameY;
     float explosionRadius;
-    bool toDeleted;
-
+public:
+    void nextFrame();
 };
-
+}
 #endif // BOMB_H

@@ -1,36 +1,27 @@
 #include "Wall.h"
-Wall::Wall(QObject *parent) : QObject(parent), QGraphicsItem()
+
+using namespace bmb;
+
+Wall::Wall(QString name, QPointF pos, QRectF bounds, bool isBreakable, Object * parent)  : Object(name, pos, bounds, parent)
 {
-
-}
-Wall::Wall(float x, float y, QObject *parent) : QObject(parent), QGraphicsItem()
-{
-
-
-    sprite = new QPixmap("images/wall.png");
-    setPos(x,y);
+    this->isBreakable = isBreakable;
 }
 
 
 
-
-
-void Wall::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget * widget)
+void Wall::nextFrame()
 {
-    painter->drawPixmap(0, 0 , *sprite, 0, 0, 34, 34);
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+    if(isBreakable && getAnimation() == Animation::BREAK)
+    {
+        if(getCurrentFrame().x() != getSpriteSize()*2)
+        {
+        setCurrentFrame(getCurrentFrame().x() + getSpriteSize(), getCurrentFrame().y() );
+        }
+        else{
+            setToDeleted(true);
+        }
+    }
+    update(0.f,0.f,getSpriteSize(),getSpriteSize());
 }
 
-
-QRectF Wall::boundingRect() const
-{
-    return QRectF(0,0,34,34);
-}
-
-QRectF Wall::getBounds()
-{
-    QRectF rect(pos().x(),pos().y(),34,34);
-    return rect;
-}
 

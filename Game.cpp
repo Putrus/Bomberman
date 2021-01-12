@@ -13,29 +13,42 @@ Game::Game(QWidget *parent)
     character = new Character(Name::PENGUIN_WELDER);
     character->setZValue(6);
     scene->addItem(character);
-    walls = new std::vector<Wall*>();
+    walls = new std::vector<bmb::Wall*>();
     for(int i=1;i<7;i++)
     {
         for(int j=1;j<7;j++)
         {
-            Wall *wall = new Wall(i*68,j*68);
+            bmb::Wall *wall = new bmb::Wall("wall",QPointF(i*100,j*100), QRectF(15.f,15.f,34.f,34.f));
             walls->push_back(wall);
             scene->addItem(wall);
         }
     }
-    bombs = new std::vector<Bomb*>();
+    bombs = new std::vector<bmb::Bomb*>();
     timer = new QTimer();
     QObject::connect(timer, &QTimer::timeout, character, [=](){character->move(walls);});
     QObject::connect(timer, &QTimer::timeout, this, &Game::checkBombCollisions);
     timer->start(17);
 
+
+    bmb::Wall * object = new bmb::Wall("wall", QPointF(150.f,150.f), QRectF(15.f,15.f,34.f,34.f), true);
+    scene->addItem(object);
+    QTimer *t = new QTimer();
+    QObject::connect(t, &QTimer::timeout, object, [=](){object->setAnimation(bmb::Animation::BREAK);});
+    t->start(4000);
+    QTimer *te = new QTimer();
+    QObject::connect(te, &QTimer::timeout, object, &bmb::Wall::nextFrame);
+    te->start(100);
+    QTimer *tb = new QTimer();
+    QObject::connect(tb, &QTimer::timeout, this, &Game::updateAnimation);
+    tb->start(100);
 }
 
 
 void Game::mousePressEvent(QMouseEvent *ev)
 {
     Character character;
-    Bomb *bomb = new Bomb(character, ev->x()-64, ev->y()-64);
+    QString bomb_name = "bomb_sprite";
+    bmb::Bomb *bomb = new bmb::Bomb(character, bomb_name, ev->pos());
     scene->addItem(bomb);
 }
 
@@ -92,7 +105,7 @@ void Game::keyReleaseEvent(QKeyEvent *event)
     case Qt::Key_Space:
         if(character->getBombs()>0)
         {
-        Bomb *bomb = new Bomb(*character, character->pos().x()-32, character->pos().y()-20);
+        bmb::Bomb *bomb = new bmb::Bomb(*character, "bomb_sprite");
         bomb->setZValue(5);
         scene->addItem(bomb);
         bombs->push_back(bomb);
@@ -107,7 +120,7 @@ void Game::keyReleaseEvent(QKeyEvent *event)
 void Game::checkBombCollisions()
 {
     for (auto it = bombs->begin(); it != bombs->end(); it++) {
-        if((*it)[0].ifToDeleted() == true)
+        if((*it)[0].getToDeleted() == true)
         {
             delete (*it);
             *it = nullptr;
@@ -119,5 +132,13 @@ void Game::checkBombCollisions()
                 character->setMovement(Movement::DEAD);
             }
         }
+    }
+}
+
+
+void Game::updateAnimation()
+{
+    for (auto it = bombs->begin(); it != bombs->end(); it++) {
+        (*it)->nextFrame();
     }
 }

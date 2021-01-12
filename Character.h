@@ -28,11 +28,16 @@ private:
     QPixmap * sprite;
     QTimer * animationTimer;
     QTimer * movementTimer;
+    //wielkosc obrazka postaci
     int size;
+    //jaka czynnosc wykonuje
     Movement movement;
+    //step - zmienna do animacji ruchu(czy jest na lewej czy prawej nodze gdy idzie) poniewaz tak zbudowany jest sprite
     bool step;
     float speed;
+    //ilosc bomb jakie moze rzucic w danym momencie
     int bombs;
+    //czy zyje
     bool isAlive;
 public:
     explicit Character(QObject *parent = 0);
@@ -40,13 +45,21 @@ public:
     void setMovement(Movement mov);
     Movement getMovement();
     QRectF getBounds();
+    //kolizje z bombami
+    bool bombCollision(float bombX, float bombY, float radius);
+    //getters and setters
     //dodanie bomb, ktore moze rzucic
     void setBombs(int b);
     int getBombs();
-    bool bombCollision(float bombX, float bombY, float radius);
+    //sprawdzenie czy zyje
     bool getIsAlive();
+    //ustawienie nowej predkosci
+    void setSpeed(float v);
+    float getSpeed();
+    int score;
+
 public slots:
-    void move(std::vector<Wall*> * walls);
+    void move(std::vector<bmb::Wall*> * walls);
 
 
 private:
@@ -54,8 +67,8 @@ private:
     QRectF boundingRect() const;
     void nextFrame();
     void calcFrame(int frameY, bool idle);
-    bool collision(Wall * wall, float speedX, float speedY);
-    bool allCollisions(std::vector<Wall*> * walls, float speedX, float speedY);
+    bool collision(bmb::Wall * wall, float speedX, float speedY);
+    bool allCollisions(std::vector<bmb::Wall*> * walls, float speedX, float speedY);
 
 
 };
