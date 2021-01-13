@@ -29,7 +29,7 @@ protected:
 public:
     Object(QString name, QPointF pos = QPointF(0.f, 0.f), QRectF bounds = QRectF(0.f, 0.f, 0.f, 0.f), QObject *parent = 0);
     virtual void nextFrame();
-
+    virtual void gameUpdate(bool isDamage = false, bool canMove = true);
     //getters and setters
     QRectF getBounds();
     void setBounds();

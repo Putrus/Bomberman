@@ -10,67 +10,48 @@
 #include <QKeyEvent>
 #include <QDebug>
 #include <vector>
-#include "Wall.h"
-
-
-enum class Name {PENGUIN_WELDER};
-
-enum class Movement{UP, LEFT, DOWN, RIGHT, IDLE_UP, IDLE_LEFT, IDLE_RIGHT, IDLE_DOWN, DEAD};
+#include "Object.h"
 
 
 
-class Character : public QObject, public QGraphicsItem
+
+namespace bmb{
+class Character : public Object
 {
-    Q_OBJECT
 private:
-    int currentFrameX;
-    int currentFrameY;
-    QPixmap * sprite;
-    QTimer * animationTimer;
-    QTimer * movementTimer;
-    //wielkosc obrazka postaci
-    int size;
-    //jaka czynnosc wykonuje
-    Movement movement;
-    //step - zmienna do animacji ruchu(czy jest na lewej czy prawej nodze gdy idzie) poniewaz tak zbudowany jest sprite
     bool step;
-    float speed;
-    //ilosc bomb jakie moze rzucic w danym momencie
+    //aktualna predkosc
+    QPointF speed;
+    //predkosc ogolna maksymalna
+    float velocity;
     int bombs;
-    //czy zyje
-    bool isAlive;
-public:
-    explicit Character(QObject *parent = 0);
-    explicit Character(Name name, float x = 0, float y = 0, int size = 64, QObject *parent = 0);
-    void setMovement(Movement mov);
-    Movement getMovement();
-    QRectF getBounds();
-    //kolizje z bombami
-    bool bombCollision(float bombX, float bombY, float radius);
-    //getters and setters
-    //dodanie bomb, ktore moze rzucic
-    void setBombs(int b);
-    int getBombs();
-    //sprawdzenie czy zyje
-    bool getIsAlive();
-    //ustawienie nowej predkosci
-    void setSpeed(float v);
-    float getSpeed();
+    //to jeszcze moze do zmienienia i wrzucenia do klasy Player
     int score;
-
-public slots:
-    void move(std::vector<bmb::Wall*> * walls);
-
-
 private:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget * widget);
-    QRectF boundingRect() const;
+    void calcFrame(float frameY, bool idle);
+public:
+    explicit Character(QString name, QPointF pos = QPointF(0.f, 0.f), QRectF bounds = QRectF(0.f, 0.f, 0.f, 0.f), Object *parent = 0);
     void nextFrame();
-    void calcFrame(int frameY, bool idle);
-    bool collision(bmb::Wall * wall, float speedX, float speedY);
-    bool allCollisions(std::vector<bmb::Wall*> * walls, float speedX, float speedY);
+    void gameUpdate(bool isDamage = false, bool canMove = true);
+
+    //jak setAnimation tylko jeszcze predkosc sie ustala automatycznie
+    void setAction(Animation action);
+    //getters and setters
+    int getBombs();
+    void setBombs(int bombs);
+
+    QPointF getSpeed();
+    void setSpeed(QPointF speed);
+    void setSpeed(float speedX, float speedY);
+
+    float getVelocity();
+    void setVelocity(float velocity);
+
+    int getScore();
+    void setScore(int score);
+    void addScore(int add);
 
 
 };
-
+}
 #endif // CHARACTER_H

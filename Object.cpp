@@ -50,6 +50,10 @@ QRectF bmb::Object::boundingRect() const
 void bmb::Object::nextFrame()
 {}
 
+void bmb::Object::gameUpdate(bool isDamage, bool canMove)
+{}
+
+
 QRectF bmb::Object::getBounds()
 {
 

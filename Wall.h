@@ -15,6 +15,7 @@ private:
     bool isBreakable;
 public:
     void nextFrame();
+    void gameUpdate(bool isDamage = false, bool canMove = true);
 };
 }
 #endif // WALL_H

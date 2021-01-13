@@ -1,239 +1,189 @@
 #include "Character.h"
 
-Character::Character(QObject *parent) :QObject(parent), QGraphicsItem()
-{
+using namespace bmb;
 
-}
-Character::Character(Name name, float x, float y, int size, QObject *parent) : QObject(parent), QGraphicsItem()
+Character::Character(QString name, QPointF pos, QRectF bounds, Object *parent) : Object(name, pos, bounds, parent)
 {
-    QString n = "images/";
-    switch(name)
-    {
-        case Name::PENGUIN_WELDER:
-            n += "penguin_welder.png";
-            break;
-        default:
-            n += "penguin_welder.png";
-            break;
-    }
-    sprite = new QPixmap(n);
-    this->size = size;
-    currentFrameX = 0;
-    currentFrameY = 0;
-    animationTimer = new QTimer();
-    connect(animationTimer, &QTimer::timeout, this, &Character::nextFrame);
-    animationTimer->start(100);
     step = 0;
-    speed = 2;
-    movement = Movement::IDLE_DOWN;
     bombs = 1;
-    isAlive = true;
+    speed = QPointF(0.f, 0.f);
+    velocity = 0.15f;
     score = 0;
 }
 
-void Character::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget * widget)
-{
-    painter->drawPixmap(0, 0 , *sprite, currentFrameX, currentFrameY, size, size);
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-}
-
-
-QRectF Character::boundingRect() const
-{
-    return QRectF(0,0,size,size);
-}
 
 void Character::nextFrame()
 {
-    switch(movement)
+    switch(getAnimation())
     {
-    case Movement::IDLE_UP:
-        calcFrame(size*2, true);
+    case Animation::IDLE_UP:
+        calcFrame(getSpriteSize()*2, true);
         break;
-    case Movement::IDLE_LEFT:
-        calcFrame(size*3, true);
+    case Animation::IDLE_LEFT:
+        calcFrame(getSpriteSize()*3, true);
         break;
-    case Movement::IDLE_DOWN:
+    case Animation::IDLE_DOWN:
         calcFrame(0, true);
         break;
-    case Movement::IDLE_RIGHT:
-        calcFrame(size, true);
+    case Animation::IDLE_RIGHT:
+        calcFrame(getSpriteSize(), true);
         break;
-    case Movement::UP:
-        calcFrame(size*6, false);
+    case Animation::UP:
+        calcFrame(getSpriteSize()*6, false);
         break;
-    case Movement::LEFT:
-        calcFrame(size*7, false);
+    case Animation::LEFT:
+        calcFrame(getSpriteSize()*7, false);
         break;
-    case Movement::DOWN:
-        calcFrame(size*4, false);
+    case Animation::DOWN:
+        calcFrame(getSpriteSize()*4, false);
         break;
-    case Movement::RIGHT:
-        calcFrame(size*5, false);
+    case Animation::RIGHT:
+        calcFrame(getSpriteSize()*5, false);
         break;
-    case Movement::DEAD:
-        calcFrame(size*8,true);
+    case Animation::BREAK:
+        calcFrame(-1.f,true);
+        break;
+    default:
+        setCurrentFrame(QPointF(0.0f,0.0f));
         break;
     }
-    this->update(0,0,size,size);
+    this->update(0, 0, getSpriteSize(), getSpriteSize());
 }
 
-void Character::calcFrame(int frameY, bool idle)
+void Character::calcFrame(float frameY, bool idle)
 {
     //czy postac zyje
-    if(frameY != size*8)
+    if(getAnimation() != Animation::BREAK)
     {
     if(idle == true)
     {
-        currentFrameY = frameY;
-        if(currentFrameX == size)
+        setCurrentFrame(getCurrentFrame().x(), frameY);
+        if(getCurrentFrame().x() == getSpriteSize())
         {
-            currentFrameX = 0;
+            setCurrentFrame(0.f, getCurrentFrame().y());
         }
         else{
-            currentFrameX = size;
+            setCurrentFrame(getSpriteSize(), getCurrentFrame().y());
         }
     }
-    if(idle == false)
+    else
     {
-        if(currentFrameY == frameY - size*4)
+        if(getCurrentFrame().y() == frameY - getSpriteSize()*4)
         {
-            currentFrameY = frameY;
+            setCurrentFrame(getCurrentFrame().x(), frameY);
             if(step == 0)
             {
-                currentFrameX = 0;
+                setCurrentFrame(0.f, getCurrentFrame().y());
                 step = 1;
             }else{
-                currentFrameX = size;
+                setCurrentFrame(getSpriteSize(), getCurrentFrame().y());
                 step = 0;
             }
         }
         else{
-            currentFrameY = frameY - size*4;
-            currentFrameX = 0;
+            setCurrentFrame(0.f, frameY - getSpriteSize()*4);
         }
     }
     }
     else{
-        isAlive = false;
-        currentFrameY = frameY;
-        if(currentFrameX != 128)
+        setCurrentFrame(getCurrentFrame().x(), getSpriteSize() * 8);
+        if(getCurrentFrame().x() == getSpriteSize()*2)
         {
-            currentFrameX +=64;
+            setToDeleted(true);
+            return;
         }
+        setCurrentFrame(getCurrentFrame().x() + getSpriteSize(), getCurrentFrame().y());
     }
 }
-void Character::move(std::vector<bmb::Wall*> * walls)
+
+
+void Character::setAction(Animation action)
 {
-    switch(movement)
+    setAnimation(action);
+    switch(action)
     {
-        case Movement::RIGHT:
-            if(!allCollisions(walls, speed,0))
-                setPos(pos().x()+speed,pos().y());
+    case Animation::UP:
+        setSpeed(0.f, -velocity);
         break;
-        case Movement::UP:
-            if(!allCollisions(walls, 0,-speed))
-            setPos(pos().x(),pos().y()-speed);
+    case Animation::LEFT:
+        setSpeed(-velocity, 0.f);
         break;
-        case Movement::LEFT:
-            if(!allCollisions(walls, -speed,0))
-            setPos(pos().x()-speed,pos().y());
+    case Animation::DOWN:
+        setSpeed(0.f, velocity);
         break;
-        case Movement::DOWN:
-            if(!allCollisions(walls, 0,speed))
-            setPos(pos().x(),pos().y()+speed);
+    case Animation::RIGHT:
+        setSpeed(velocity, 0.f);
         break;
-        default:
+    default:
+        setSpeed(0.f, 0.f);
         break;
     }
 }
 
 
-
-void Character::setMovement(Movement mov)
+void Character::gameUpdate(bool isDamage, bool canMove)
 {
-    this->movement = mov;
-}
-
-
-Movement Character::getMovement()
-{
-    return this->movement;
-}
-
-bool Character::collision(bmb::Wall * wall, float speedX, float speedY)
-{
-    float top = getBounds().top();
-    float bottom = getBounds().bottom();
-    float left = getBounds().left();
-    float right = getBounds().right();
-    float wTop = wall->getBounds().top();
-    float wBottom = wall->getBounds().bottom();
-    float wLeft = wall->getBounds().left();
-    float wRight = wall->getBounds().right();
-    if(right + speedX >= wLeft && top + speedY <= wBottom && bottom + speedY >= wTop && left + speedX <= wRight)
-        {
-        return true;
-        }
-    return false;
-}
-
-bool Character::allCollisions(std::vector<bmb::Wall*> * walls, float speedX, float speedY)
-{
-    for(int i=0;i<walls->size();i++)
+    qDebug() << isDamage << " " << canMove;
+    if(isDamage)
     {
-        if(collision((*walls)[i],speedX,speedY))
-            return true;
+        setAction(Animation::BREAK);
+        return;
     }
-    return false;
+    if(canMove)
+    {
+        setPos(pos() + speed);
+    }
+
 }
 
-QRectF Character::getBounds()
+
+int Character::getBombs()
 {
-    QRectF rect(pos().x()+24, pos().y()+52,18,8);
-    return rect;
+    return bombs;
 }
-
 
 void Character::setBombs(int b)
 {
     this->bombs = b;
 }
 
-int Character::getBombs()
+QPointF Character::getSpeed()
 {
-    return this->bombs;
+    return speed;
+}
+
+void Character::setSpeed(QPointF speed)
+{
+    this->speed = speed;
+}
+
+void Character::setSpeed(float speedX, float speedY)
+{
+    this->speed = QPointF(speedX, speedY);
 }
 
 
-bool Character::bombCollision(float x, float y, float radius)
+float Character::getVelocity()
 {
-    float top = pos().y()+9;
-    float bottom = pos().y()+60;
-    float left = pos().x()+24;
-    float right = pos().x()+42;
-    float dis1 = sqrt((x-left)*(x-left) + (y-top)*(y-top));
-    float dis2 = sqrt((x-left)*(x-left) + (y-bottom)*(y-bottom));
-    float dis3 = sqrt((x-right)*(x-right) + (y-top)*(y-top));
-    float dis4 = sqrt((x-right)*(x-right) + (y-bottom)*(y-bottom));
-    if(dis1 <= radius || dis2 <= radius || dis3 <= radius || dis4 <= radius)
-    {
-        return true;
-    }
-    return false;
+    return velocity;
 }
 
-bool Character::getIsAlive()
+void Character::setVelocity(float velocity)
 {
-    return isAlive;
+    this->velocity = velocity;
 }
 
-void Character::setSpeed(float v)
+int Character::getScore()
 {
-    this->speed = v;
+    return score;
 }
-float Character::getSpeed()
+
+void Character::setScore(int score)
 {
-    return this->speed;
+    this->score = score;
+}
+
+void Character::addScore(int add)
+{
+    this->score+=add;
 }

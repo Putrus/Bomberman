@@ -24,4 +24,11 @@ void Wall::nextFrame()
     update(0.f,0.f,getSpriteSize(),getSpriteSize());
 }
 
+void Wall::gameUpdate(bool isDamage, bool canMove)
+{
+    if(isDamage)
+    {
+        setAnimation(Animation::BREAK);
+    }
+}
 
