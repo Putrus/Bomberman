@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     Bomb.cpp \
+    Bomberman.cpp \
     Character.cpp \
     Game.cpp \
     Object.cpp \
@@ -18,6 +19,7 @@ SOURCES += \
 
 HEADERS += \
     Bomb.h \
+    Bomberman.h \
     Character.h \
     Game.h \
     Object.h \
@@ -28,4 +30,5 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-FORMS +=
+FORMS += \
+    bomberman.ui

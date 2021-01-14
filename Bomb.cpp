@@ -6,7 +6,7 @@ Bomb::Bomb(Character & character, QString name, QPointF pos, QRectF bounds, Obje
 {
     this->character = &character;
     this->character->setBombs(this->character->getBombs()-1);
-    explosionRadius = 26;
+    explosionRadius = 40;
     if(pos == QPointF(-420.69f, -420.69f))
     {
         setPos(character.pos().x() - 32, character.pos().y() - 20);
@@ -19,14 +19,14 @@ Bomb::Bomb(Character & character, QString name, QPointF pos, QRectF bounds, Obje
 void Bomb::nextFrame()
 {
     setCurrentFrame(getCurrentFrame().x()+128, getCurrentFrame().y());
-    if(getCurrentFrame() == QPointF(1152.f, 128.f))
+    if(getCurrentFrame() == QPointF(1152.f, 256.f))
     {
         character->setBombs(character->getBombs()+1);
         setToDeleted(true);
     }
     if(getCurrentFrame().x() == 1152)
     {
-        setCurrentFrame(0.0f,getCurrentFrame().y() + 128);
+        setCurrentFrame(0.0f,getCurrentFrame().y() + 256);
     }
 
     this->update(0, 0, getSpriteSize(), getSpriteSize());
@@ -40,7 +40,7 @@ void Bomb::gameUpdate(bool isDamage, bool canMove)
 
 bool Bomb::ifExplodes()
 {
-    if(getCurrentFrame().y() == getSpriteSize())
+    if(getCurrentFrame().y() != 0)
     {
         return true;
     }

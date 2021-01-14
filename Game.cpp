@@ -1,5 +1,4 @@
 #include "Game.h"
-
 Game::Game(QWidget *parent)
 {
     scene = new QGraphicsScene();
@@ -26,9 +25,15 @@ Game::Game(QWidget *parent)
     {
         for(int j=1;j<7;j++)
         {
-            bmb::Wall *wall = new bmb::Wall("wall",QPointF(i*100,j*100), QRectF(15.f,15.f,34.f,34.f), true);
+            bmb::Wall *wall = new bmb::Wall("wall",QPointF(i*68,j*68), QRectF(15.f,15.f,34.f,34.f), false);
             objects->push_back(wall);
+            bmb::Wall *wall2 = new bmb::Wall("wall",QPointF(i*68+34,j*68+34), QRectF(15.f,15.f,34.f,34.f), true);
+            objects->push_back(wall2);
+            bmb::Wall *wall3 = new bmb::Wall("wall",QPointF(i*68+34,j*68), QRectF(15.f,15.f,34.f,34.f), true);
+            objects->push_back(wall3);
             scene->addItem(wall);
+            scene->addItem(wall2);
+            scene->addItem(wall3);
         }
     }
     timer = new QTimer();

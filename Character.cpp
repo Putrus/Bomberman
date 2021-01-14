@@ -123,7 +123,6 @@ void Character::setAction(Animation action)
 
 void Character::gameUpdate(bool isDamage, bool canMove)
 {
-    qDebug() << isDamage << " " << canMove;
     if(isDamage)
     {
         setAction(Animation::BREAK);

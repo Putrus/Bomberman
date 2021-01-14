@@ -5,6 +5,10 @@ using namespace bmb;
 Wall::Wall(QString name, QPointF pos, QRectF bounds, bool isBreakable, Object * parent)  : Object(name, pos, bounds, parent)
 {
     this->isBreakable = isBreakable;
+    if(!isBreakable)
+    {
+        setCurrentFrame(192.f, 0.f);
+    }
 }
 
 
