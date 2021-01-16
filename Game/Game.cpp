@@ -195,9 +195,9 @@ bool Game::bombCollision(bmb::Object *object, bmb::Bomb * bomb)
     if(dis1 <= radius || dis2 <= radius || dis3 <= radius || dis4 <= radius)
     {
         return true;
+    } 
     }
     return false;
-    }
 }
 
 bool Game::collision(bmb::Character *character, bmb::Object *object)
