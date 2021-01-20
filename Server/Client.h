@@ -1,22 +1,24 @@
-#pragma once
 #include <iostream>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <error.h>
+#include <poll.h>
 #include <string.h>
 #include <list>
-#include <vector>
+#include "Handler.h"
+#include "Message.cpp"
 
-
-class Client{
+class Client : public Handler
+{
 public:
     int fd;
-    char message[255];
-    Client(int fd);
-    void readMessage();
-    void sendMessage(char *mess);
+    int epollFd;
+    int roomNumber;
+    Message readMessage;
+    std::list<Message> messagesToWrite;
+    void waitForWrite(bool epollout);
+public:
+    Client(int fd, int epollFd);
+    virtual ~Client();
+    virtual char handleEvent(uint32_t events) override;
+    char write(char * buffer, int count);
+    //getters and setters
+    Message getReadMessage();
 };

@@ -1,5 +1,5 @@
 #include "Game.h"
-Game::Game(QWidget *parent)
+Game::Game(QWidget *parent) : QGraphicsView(parent)
 {
     scene = new QGraphicsScene();
     scene->setSceneRect(0,0,800,600);

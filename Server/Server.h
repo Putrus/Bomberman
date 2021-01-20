@@ -1,23 +1,35 @@
 #pragma once
 #include <iostream>
-#include <fcntl.h>
+#include <cstdlib>
 #include <unistd.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <cstdio>
+#include <arpa/inet.h>
+#include <errno.h>
 #include <error.h>
+#include <netdb.h>
+#include <sys/epoll.h> 
+#include <unordered_set>
+#include <signal.h>
 #include <string.h>
-#include <list>
-#include <vector>
+#include <string>
+#include "Client.cpp"
+#include "Handler.h"
 
 
-
-class Server
+class Server : public Handler
 {
+private:
+    int serverFd;
+    //epoll
+    int epollFd;
+    //to jeszcze do ogarniecia
+    std::unordered_set<Client*> clients;
 public:
-    Server();
-
-
-
-}
+    Server(int port);
+    virtual ~Server();
+    void start();
+    char handleEvent(uint32_t events) override;
+    void sendToAll(char * buffer, int count);
+};
