@@ -63,7 +63,9 @@ void Bomberman::buttonConnects()
     connect(ui->optionsButton, &QPushButton::clicked, [=](){this->showMenu(ui->optionsMenu, ui->menu);});
     connect(ui->backOptionsButton, &QPushButton::clicked, [=](){this->showMenu(ui->menu, ui->optionsMenu);});
     connect(ui->changeUsernameButton, &QPushButton::clicked, [=](){this->setUsername(ui->textEditUsername->toPlainText());});
-
+    //roomsMenu
+    connect(ui->createButton, &QPushButton::clicked, this, &Bomberman::createRoom);
+    connect(ui->joinButton, &QPushButton::clicked, this, &Bomberman::joinBtnHit);
 
 }
 
@@ -120,9 +122,25 @@ void Bomberman::connectBtnHit()
     });
     connect(sock, &QTcpSocket::connected, this, &Bomberman::socketConnected);
     connect(sock, &QTcpSocket::disconnected, this, &Bomberman::socketDisconnected);
+    connect(sock, &QTcpSocket::readyRead, this, &Bomberman::socketReadable);
     sock->connectToHost(ui->textEditAddress->toPlainText(), ui->textEditPort->toPlainText().toInt());
     connTimeoutTimer->start(3000);
+
 }
+
+
+void Bomberman::joinBtnHit()
+{
+
+    if(!ui->listRooms->selectedItems().isEmpty())
+    {
+    QString joinRoom = ui->listRooms->selectedItems().first()->text();
+    qDebug() << joinRoom << "  joinroom ";
+    sendMessage("j" + joinRoom);
+    }
+}
+
+
 
 
 void Bomberman::socketConnected()
@@ -140,4 +158,52 @@ void Bomberman::socketDisconnected()
     QMessageBox::critical(this, "Error", "Disconnected frm the server!");
     ui->textEditConnectedInfo->append("<b>Disconnected from the server!</b>");
     this->hideAll();
+}
+
+
+void Bomberman::sendMessage(QString message)
+{
+    sock->write(message.toUtf8());
+}
+
+void Bomberman::createRoom()
+{
+    QString maxPlayers = ui->textEditMaxPlayers->toPlainText();
+    QString roomName = ui->textEditRoomName->toPlainText();
+    if((maxPlayers == "2" || maxPlayers == "3" || maxPlayers == "4") && roomName.length() > 0)
+    {
+    sendMessage("c" + maxPlayers + roomName.toUpper() + ";");
+    }
+}
+
+
+void Bomberman::socketReadable()
+{
+    QByteArray b = sock->readAll();
+    QString message = QString(b);
+    if(message.length()>0)
+    {
+    //r info o pokojach
+
+    if(message[0] == 'r')
+    {
+        ui->listRooms->clear();
+        message.remove(0,2);
+        int counter = 0;
+        for(int i=0;i<message.length();i++)
+        {
+            if(message[i] == ';')
+            {
+                QString roomName = message.mid(counter, i-counter);
+                counter = i+1;
+                ui->listRooms->addItem(roomName);
+            }
+        }
+    }
+    if(message[0] == 'j')
+    {
+        qDebug() << "DOLACZYLES DO ROOMU YEAH " << message;
+    }
+    message = "";
+}
 }

@@ -33,11 +33,15 @@ private:
     void buttonConnects();
     //sieciowe sprawy
     void connectBtnHit();
+    void joinBtnHit();
     void socketConnected();
     void socketDisconnected();
+    void socketReadable();
     //getters setters
     void setUsername(QString username);
     void readUsername();
+    void sendMessage(QString message);
+    void createRoom();
 };
 
 #endif // BOMBERMAN_H

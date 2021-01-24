@@ -37,7 +37,7 @@ Server::Server(int port)
 
     epollFd = epoll_create1(0);
 
-    
+    memset(buffer, 0, 255);
 }
 
 Server::~Server()
@@ -61,31 +61,65 @@ void Server::start()
             error(1, 0, "Epoll_wait failed!");
             break;
         }
-        char action = (((Handler*)ee.data.ptr)->handleEvent(ee.events));
+        char * action = (((Handler*)ee.data.ptr)->handleEvent(ee.events));
         //res == 1 oznacza, ze client sie rozlaczyl. Pozdro
         //tutaj akcje servera
-        if(action == '1')
+        if(strcmp(action, "one") == 0)
         {
             break;
         }
-        else if(action == '2')
+        if(strcmp(action, "deleteClient") == 0)
         {
             Client * clientToRemove = &(*(Client*)ee.data.ptr);
-            std::cout << "Removing client with fd: " << clientToRemove->fd << std::endl;
-            clients.erase(clientToRemove);
-            delete clientToRemove;
+            removeClient(clientToRemove);
         }
-        else if(res == '0')
+        if(action[0] == 'c')
         {
-            break;
-        }
+           char roomName[255];
+           memset(roomName,0,255);
+           strncat(roomName, action+2,strlen(action)-3);
+           if(!ifRoomNameExists(roomName))
+           {
+                Room * room = new Room(action[1]%48, roomName);
+                rooms.insert(room);
+                std::cout << "New room with name " << roomName << " created!" << std::endl; 
+                char * roomInfoChar = roomInfo();
+                sendToAll(roomInfoChar, strlen(roomInfoChar));
+                
+           }
 
+           memset(roomName,0,255);
+        }
+        if(action[0] == 'j')
+        {
+            Client * client = &(*(Client*)ee.data.ptr);
+            char roomName[255];
+            memset(roomName,0,255);
+            strncat(roomName, action+1,strlen(action)-5);
+            std::cout << "Room name to join: "<<roomName<<std::endl;
+            for(Room * room : rooms)
+            {
+                if(strcmp(room->getName(), roomName) == 0)
+                {
+                    if((int)room->getClients().size() < room->getMaxPlayers())
+                    {
+                        client->write(action, strlen(action) - 3);
+                        room->addClient(client);
+                        char * roomInfoChar = roomInfo();
+                        sendToAll(roomInfoChar, strlen(roomInfoChar));
+                    }
+                }
+            }
+        }
+        
+        memset(action, 0, 255);
     }
 }
 
 
-char Server::handleEvent(uint32_t events)
+char * Server::handleEvent(uint32_t events)
 {
+    memset(bufferInfo,0,255);
     if(events & EPOLLIN){
         sockaddr_in clientAddr{};
         socklen_t clientAddrSize = sizeof(clientAddr);
@@ -94,26 +128,76 @@ char Server::handleEvent(uint32_t events)
         if(clientFd == -1)
         {
             error(1, 0, "Accept failed!");
+            strcpy(bufferInfo,"one");
+            return bufferInfo;
         }
 
         std::cout << "New connection from " << inet_ntoa(clientAddr.sin_addr) << ":" << ntohs(clientAddr.sin_port) << " assigned fd: " << clientFd << std::endl; 
+        Client * client = new Client(clientFd, epollFd);
+        clients.insert(client);
+        char * m = roomInfo();
+        client->write(buffer, strlen(m));
         
-        clients.insert(new Client(clientFd, epollFd));
     }
     if(events & ~EPOLLIN){
         error(1, 0, "Event %x on server socket", events);
-        return '1';
+        strcpy(bufferInfo,"one");
+        return bufferInfo;
     }
-
-    return '0';
+    strcpy(bufferInfo,"newConnection");
+    return bufferInfo;
 }
 
 
 
 void Server::sendToAll(char * buffer, int count)
 {
-    for(auto it = clients.begin(); it!=clients.end();it++)
+    for(Client * client : clients)
     {
-        (*it)->write(buffer, count);
+        if(client->write(buffer, count) == -1)
+        {
+            removeClient(client);
+        }
     }
 }
+
+
+bool Server::ifRoomNameExists(char * name)
+{
+    for(Room * room : rooms)
+    {
+        if(strcmp(room->getName(), name) == 0)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+void Server::removeClient(Client * client)
+{
+    std::cout << "Removing client with fd: " << client->fd << std::endl;
+    clients.erase(client);
+    delete client;
+}
+
+char * Server::roomInfo()
+{
+    memset(buffer,0,255);
+    strcpy(buffer,"r ");
+    for(Room * room : rooms)
+    {
+        strncat(buffer, room->getName(), strlen(room->getName()));
+        char mp = room->getMaxPlayers() + '0';
+        char pl = (int)room->getClients().size() + '0';
+        char info[4] = {' ',pl,'/', mp};
+        strncat(buffer, info, 4);
+        strcat(buffer, ";\0");
+    }
+    return buffer;
+}
+
+
+
+

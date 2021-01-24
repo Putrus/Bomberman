@@ -14,9 +14,8 @@
 #include <signal.h>
 #include <string.h>
 #include <string>
-#include "Client.cpp"
 #include "Handler.h"
-
+#include "Room.cpp"
 
 class Server : public Handler
 {
@@ -26,10 +25,16 @@ private:
     int epollFd;
     //to jeszcze do ogarniecia
     std::unordered_set<Client*> clients;
+    std::unordered_set<Room*> rooms;
+    char buffer[255];
+    char bufferInfo[255];
 public:
     Server(int port);
     virtual ~Server();
     void start();
-    char handleEvent(uint32_t events) override;
+    char * handleEvent(uint32_t events) override;
     void sendToAll(char * buffer, int count);
+    bool ifRoomNameExists(char * name);
+    void removeClient(Client * client);
+    char * roomInfo();
 };

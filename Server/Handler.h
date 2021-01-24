@@ -2,5 +2,5 @@
 class Handler{
 public:
     virtual ~Handler(){}; 
-    virtual char handleEvent(uint32_t events) = 0;
+    virtual char * handleEvent(uint32_t events) = 0;
 };

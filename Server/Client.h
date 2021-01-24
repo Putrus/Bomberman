@@ -14,11 +14,12 @@ public:
     Message readMessage;
     std::list<Message> messagesToWrite;
     void waitForWrite(bool epollout);
+    char bufferInfo[255];
 public:
     Client(int fd, int epollFd);
     virtual ~Client();
-    virtual char handleEvent(uint32_t events) override;
-    char write(char * buffer, int count);
+    virtual char * handleEvent(uint32_t events) override;
+    int write(char * buffer, int count);
     //getters and setters
     Message getReadMessage();
 };

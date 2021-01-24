@@ -18,7 +18,8 @@ Client::~Client()
     close(fd);
 }
 
-char Client::handleEvent(uint32_t events){
+char * Client::handleEvent(uint32_t events){
+memset(bufferInfo,0,255);
 if(events & EPOLLIN)
 {
     
@@ -28,10 +29,10 @@ if(events & EPOLLIN)
         events |= EPOLLERR;
     }
     else{
-        return readMessage.getData()[0];
-        memset(readMessage.getData(), 0, readMessage.getLen());
+        strcpy(bufferInfo, readMessage.getData());
+        memset(readMessage.getData(), 0, count);
+        return bufferInfo;
     }
-    return '0';
 
 }
 if(events & EPOLLOUT) {
@@ -55,29 +56,32 @@ if(events & EPOLLOUT) {
 
 if(events & ~(EPOLLIN|EPOLLOUT))
 {   
-    return 1;
+    
+    strcpy(bufferInfo, "deleteClient");
+    return bufferInfo;
 }
-    return 0;
+    strcpy(bufferInfo,"nothing");
+    return bufferInfo;
 }
 
 
 
-char Client::write(char * buffer, int count){
+int Client::write(char * buffer, int count){
     if(messagesToWrite.size() != 0)
     {
         messagesToWrite.emplace_back(buffer, count);
-        return '0';
+        return 0;
     }
     int sent = send(fd, buffer, count, MSG_DONTWAIT);
     if(sent == count)
     {
-        return '0';
+        return 0;
     }
     if(sent == -1)
     {
         if(errno != EWOULDBLOCK && errno != EAGAIN){
-            //zwraca 1 czyli client do usuniecia
-            return '2';
+            //zwraca 2 czyli client do usuniecia
+            return -1;
         }
         messagesToWrite.emplace_back(buffer, count);
     }else
@@ -85,7 +89,7 @@ char Client::write(char * buffer, int count){
         messagesToWrite.emplace_back(buffer + sent, count - sent);    
     }
     waitForWrite(true);
-    return '0';
+    return 0;
 }
 
 

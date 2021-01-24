@@ -390,7 +390,7 @@
      <property name="geometry">
       <rect>
        <x>570</x>
-       <y>70</y>
+       <y>110</y>
        <width>41</width>
        <height>41</height>
       </rect>
@@ -404,8 +404,8 @@
     <widget class="QLabel" name="labelMaxPlayers">
      <property name="geometry">
       <rect>
-       <x>350</x>
-       <y>60</y>
+       <x>340</x>
+       <y>110</y>
        <width>201</width>
        <height>51</height>
       </rect>
@@ -419,44 +419,11 @@
       <string>Max Players</string>
      </property>
     </widget>
-    <widget class="QLabel" name="labelPassword">
-     <property name="geometry">
-      <rect>
-       <x>350</x>
-       <y>120</y>
-       <width>121</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>15</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Password</string>
-     </property>
-    </widget>
-    <widget class="QTextEdit" name="textEditPassword">
-     <property name="geometry">
-      <rect>
-       <x>480</x>
-       <y>120</y>
-       <width>131</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>15</pointsize>
-      </font>
-     </property>
-    </widget>
     <widget class="QPushButton" name="createButton">
      <property name="geometry">
       <rect>
        <x>330</x>
-       <y>170</y>
+       <y>160</y>
        <width>281</width>
        <height>51</height>
       </rect>
@@ -486,6 +453,39 @@
      </property>
      <property name="text">
       <string>Back</string>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="textEditRoomName">
+     <property name="geometry">
+      <rect>
+       <x>510</x>
+       <y>60</y>
+       <width>131</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>15</pointsize>
+      </font>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelRoomName">
+     <property name="geometry">
+      <rect>
+       <x>340</x>
+       <y>60</y>
+       <width>201</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>15</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Room name</string>
      </property>
     </widget>
    </widget>
@@ -639,10 +639,10 @@
    </widget>
    <zorder>playMenu</zorder>
    <zorder>menu</zorder>
-   <zorder>onlineMenu</zorder>
    <zorder>optionsMenu</zorder>
    <zorder>username</zorder>
    <zorder>connectMenu</zorder>
+   <zorder>onlineMenu</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
