@@ -251,7 +251,57 @@ void Bomberman::socketReadable()
         playerNumber = (*it)[1].digitValue();
         game = new Game((*it)[2].digitValue(), ui->centralwidget);
         game->show();
+        ui->roomMenu->hide();
     }
+
+    if((*it)[0] == 'g')
+    {
+        QChar action = (*it)[1];
+        int k = (*it)[2].digitValue();
+        std::vector<bmb::Character*> characters;
+        bmb::Character * character = game->getCharacter(k);
+        if(action == 'u')
+        {
+            character->setAction(bmb::Animation::UP);
+        }
+        if(action == 'l')
+        {
+            character->setAction(bmb::Animation::LEFT);
+        }
+        if(action == 'r')
+        {
+            character->setAction(bmb::Animation::RIGHT);
+        }
+        if(action == 'd')
+        {
+            character->setAction(bmb::Animation::DOWN);
+        }
+        if(action == 'y')
+        {
+            character->setAction(bmb::Animation::IDLE_UP);
+        }
+        if(action == 'k')
+        {
+            character->setAction(bmb::Animation::IDLE_LEFT);
+        }
+        if(action == 't')
+        {
+            character->setAction(bmb::Animation::IDLE_RIGHT);
+        }
+        if(action == 'c')
+        {
+            character->setAction(bmb::Animation::IDLE_DOWN);
+        }
+        if(action == 'b')
+        {
+            game->createBomb(character);
+        }
+
+    }
+
+
+
+
     }
     actions.clear();
     actions.shrink_to_fit();
@@ -264,95 +314,65 @@ void Bomberman::socketReadable()
 
 
 //sterowanie
-/*
-void Game::keyPressEvent(QKeyEvent *event)
+void Bomberman::keyPressEvent(QKeyEvent *event)
 {
+    if(game != NULL)
+    {
     switch(event->key())
     {
     case Qt::Key_W:
-        (*characters)[0]->setAction(bmb::Animation::UP);
+        //(*characters)[0]->setAction(bmb::Animation::UP);
+        sendMessage("gu"+QString::number(playerNumber)+";");
         break;
     case Qt::Key_A:
-        (*characters)[0]->setAction(bmb::Animation::LEFT);
+        //(*characters)[0]->setAction(bmb::Animation::LEFT);
+        sendMessage("gl"+QString::number(playerNumber)+";");
         break;
     case Qt::Key_S:
-        (*characters)[0]->setAction(bmb::Animation::DOWN);
+        //(*characters)[0]->setAction(bmb::Animation::DOWN);
+        sendMessage("gd"+QString::number(playerNumber)+";");
         break;
     case Qt::Key_D:
-        (*characters)[0]->setAction(bmb::Animation::RIGHT);
+        //(*characters)[0]->setAction(bmb::Animation::RIGHT);
+        sendMessage("gr"+QString::number(playerNumber)+";");
         break;
-    case Qt::Key_Y:
-        (*characters)[1]->setAction(bmb::Animation::UP);
-        break;
-    case Qt::Key_G:
-        (*characters)[1]->setAction(bmb::Animation::LEFT);
-        break;
-    case Qt::Key_H:
-        (*characters)[1]->setAction(bmb::Animation::DOWN);
-        break;
-    case Qt::Key_J:
-        (*characters)[1]->setAction(bmb::Animation::RIGHT);
-        break;
+    }
     }
 }
-*/
-/*
-void Game::keyReleaseEvent(QKeyEvent *event)
+
+void Bomberman::keyReleaseEvent(QKeyEvent *event)
 {
+    if(game != NULL)
+    {
+    bmb::Character * character = game->getCharacter(playerNumber);
     switch(event->key())
     {
     case Qt::Key_W:
-        if((*characters)[0]->getAnimation() == bmb::Animation::UP)
-        (*characters)[0]->setAction(bmb::Animation::IDLE_UP);
+        if(character->getAnimation() == bmb::Animation::UP)
+            sendMessage("gy"+QString::number(playerNumber)+";");
         break;
     case Qt::Key_A:
-        if((*characters)[0]->getAnimation() == bmb::Animation::LEFT)
-        (*characters)[0]->setAction(bmb::Animation::IDLE_LEFT);
+        if(character->getAnimation() == bmb::Animation::LEFT)
+            sendMessage("gk"+QString::number(playerNumber)+";");
         break;
     case Qt::Key_S:
-        if((*characters)[0]->getAnimation() == bmb::Animation::DOWN)
-        (*characters)[0]->setAction(bmb::Animation::IDLE_DOWN);
+        if(character->getAnimation() == bmb::Animation::DOWN)
+            sendMessage("gc"+QString::number(playerNumber)+";");
         break;
     case Qt::Key_D:
-        if((*characters)[0]->getAnimation() == bmb::Animation::RIGHT)
-        (*characters)[0]->setAction(bmb::Animation::IDLE_RIGHT);
+        if(character->getAnimation() == bmb::Animation::RIGHT)
+            sendMessage("gt"+QString::number(playerNumber)+";");
         break;
     case Qt::Key_Space:
-        if((*characters)[0]->getBombs()>0)
+        if(character->getBombs()>0)
         {
-        bmb::Bomb *bomb = new bmb::Bomb(*(*characters)[0], "bomb_sprite", QPointF(-420.69f, -420.69f), QRectF(52.f, 58.f, 22.f, 24.f));
-        bomb->setZValue(5);
-        scene->addItem(bomb);
-        objects->push_back(bomb);
-        }
-        break;
-    case Qt::Key_Y:
-        if((*characters)[1]->getAnimation() == bmb::Animation::UP)
-        (*characters)[1]->setAction(bmb::Animation::IDLE_UP);
-        break;
-    case Qt::Key_G:
-        if((*characters)[1]->getAnimation() == bmb::Animation::LEFT)
-        (*characters)[1]->setAction(bmb::Animation::IDLE_LEFT);
-        break;
-    case Qt::Key_H:
-        if((*characters)[1]->getAnimation() == bmb::Animation::DOWN)
-        (*characters)[1]->setAction(bmb::Animation::IDLE_DOWN);
-        break;
-    case Qt::Key_J:
-        if((*characters)[1]->getAnimation() == bmb::Animation::RIGHT)
-        (*characters)[1]->setAction(bmb::Animation::IDLE_RIGHT);
-        break;
-    case Qt::Key_K:
-        if((*characters)[1]->getBombs()>0)
-        {
-        bmb::Bomb *bomb = new bmb::Bomb(*(*characters)[1], "bomb_sprite", QPointF(-420.69f, -420.69f), QRectF(52.f, 58.f, 22.f, 24.f));
-        bomb->setZValue(5);
-        scene->addItem(bomb);
-        objects->push_back(bomb);
+        sendMessage("gb"+QString::number(playerNumber)+";");
+
         }
         break;
     }
-}*/
+    }
+}
 
 
 

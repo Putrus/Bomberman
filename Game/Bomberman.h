@@ -7,6 +7,8 @@
 #include <QDebug>
 #include <QTcpSocket>
 #include <QMessageBox>
+#include <QKeyEvent>
+#include "Bomb.h"
 #include "Game.h"
 
 
@@ -45,6 +47,9 @@ private:
     void readUsername();
     void sendMessage(QString message);
     void createRoom();
+
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 };
 
 #endif // BOMBERMAN_H

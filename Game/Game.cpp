@@ -195,7 +195,26 @@ bool Game::allCollisions(bmb::Character *character, std::vector<bmb::Object*> * 
 }
 
 
-std::vector<bmb::Character*> * Game::getCharacter()
+bmb::Character * Game::getCharacter(int number)
 {
-    return this->characters;
+    return (*this->characters)[number];
+}
+
+
+std::vector<bmb::Object*> * Game::getObjects()
+{
+    return objects;
+}
+
+QGraphicsScene * Game::getScene()
+{
+    return scene;
+}
+
+void Game::createBomb(bmb::Character *character)
+{
+    bmb::Bomb *bomb = new bmb::Bomb((*character), "bomb_sprite", QPointF(-420.69f, -420.69f), QRectF(52.f, 58.f, 22.f, 24.f));
+    bomb->setZValue(5);
+    scene->addItem(bomb);
+    objects->push_back(bomb);
 }

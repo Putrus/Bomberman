@@ -180,6 +180,28 @@ void Server::start()
             char * roomInfoChar = roomInfo();
             sendToAll(roomInfoChar, strlen(roomInfoChar));
         }
+        if(actions[i][0] == 'g')
+        {
+            Client * client = &(*(Client*)ee.data.ptr);
+            for(Room * room : rooms)
+            {
+                    if(room->clientInRoom(client))
+                    {
+                    for(Client * c : clients)
+                    {
+                        if(room->clientInRoom(c))
+                        {
+                        char mess[255];
+                        strcpy(mess, actions[i]);
+                        strcat(mess, ";");
+                        c->write(mess, strlen(mess));
+                        }
+                    }
+                    }
+            }
+            char * roomInfoChar = roomInfo();
+            sendToAll(roomInfoChar, strlen(roomInfoChar));
+        }
         memset(actions[i],0,255);
         }
         memset(handler->buffer,0,255);

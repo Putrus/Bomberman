@@ -29,7 +29,11 @@ private:
     bool collision(bmb::Character * character, bmb::Object * object);
     bool allBombsCollision(bmb::Object * object, std::vector<bmb::Object*> * objects);
     bool allCollisions(bmb::Character * character, std::vector<bmb::Object*> * objects);
-    std::vector<bmb::Character*> * getCharacter();
+public:
+    bmb::Character * getCharacter(int number);
+    std::vector<bmb::Object*> * getObjects();
+    QGraphicsScene * getScene();
+    void createBomb(bmb::Character * character);
 };
 
 #endif // GAME_H
