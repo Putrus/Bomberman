@@ -27,6 +27,7 @@ private:
     QString username;
     QTcpSocket *sock;
     QTimer * connTimeoutTimer;
+    int playerNumber;
 private:
     void showMenu(QWidget * widgetShow = nullptr, QWidget * widgetHide = nullptr);
     void hideAll();
@@ -34,6 +35,8 @@ private:
     //sieciowe sprawy
     void connectBtnHit();
     void joinBtnHit();
+    void leaveBtnHit();
+    void startBtnHit();
     void socketConnected();
     void socketDisconnected();
     void socketReadable();

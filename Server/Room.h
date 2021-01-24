@@ -8,6 +8,7 @@ private:
     std::unordered_set<Client*> clients;
     int maxPlayers;
     char name[255];
+    bool gameIsStarted;
 public:
     Room(int maxPlayers, char * name);
     
@@ -16,4 +17,7 @@ public:
     std::unordered_set<Client*> getClients();
     char  * getName();
     int getMaxPlayers();
+    bool ifGameStarted();
+    bool clientInRoom(Client * client);
+    void sendMessage(char * buffer, int count);
 };

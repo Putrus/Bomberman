@@ -9,7 +9,7 @@ Bomberman::Bomberman(QWidget *parent) :
     QFontDatabase::addApplicationFont("small_pixel.ttf");
     QFont pixelFont("Small Pixel", QFont::Normal);
     ui->setupUi(this);
-    game = new Game(ui->centralwidget);
+    game = NULL;
     ui->centralwidget->setFont(pixelFont);
     setWindowTitle("Bomberman");
     hideAll();
@@ -17,6 +17,7 @@ Bomberman::Bomberman(QWidget *parent) :
     ui->textEditPort->setText("5000");
     ui->textEditAddress->setText("localhost");
     buttonConnects();
+    this->playerNumber = 0;
 }
 
 Bomberman::~Bomberman()
@@ -41,8 +42,15 @@ void Bomberman::hideAll()
     ui->optionsMenu->hide();
     ui->onlineMenu->hide();
     ui->connectMenu->hide();
-    game->hide();
+    ui->roomMenu->hide();
+    if(game!=NULL)
+    {
+        game->hide();
+        delete game;
+        game = NULL;
+    }
     ui->menu->show();
+
 }
 
 void Bomberman::buttonConnects()
@@ -52,13 +60,13 @@ void Bomberman::buttonConnects()
     //playMenu
     connect(ui->playButton, &QPushButton::clicked, [=](){this->showMenu(ui->playMenu, ui->menu);});
     connect(ui->backPlayButton, &QPushButton::clicked, [=](){this->showMenu(ui->menu, ui->playMenu);});
-    connect(ui->offlineButton, &QPushButton::clicked, game, &Game::show);
     //connectMenu
     connect(ui->onlineButton, &QPushButton::clicked, [=](){this->showMenu(ui->connectMenu, ui->playMenu);});
     connect(ui->backConnectButton, &QPushButton::clicked, [=](){this->showMenu(ui->playMenu, ui->connectMenu);});
     //onlineMenu
     connect(ui->connectButton, &QPushButton::clicked, this, &Bomberman::connectBtnHit);
     connect(ui->backOnlineButton, &QPushButton::clicked, this, &Bomberman::socketDisconnected);
+    connect(ui->leaveRoomButton, &QPushButton::clicked, this, &Bomberman::leaveBtnHit);
     //optionsMenu
     connect(ui->optionsButton, &QPushButton::clicked, [=](){this->showMenu(ui->optionsMenu, ui->menu);});
     connect(ui->backOptionsButton, &QPushButton::clicked, [=](){this->showMenu(ui->menu, ui->optionsMenu);});
@@ -66,6 +74,8 @@ void Bomberman::buttonConnects()
     //roomsMenu
     connect(ui->createButton, &QPushButton::clicked, this, &Bomberman::createRoom);
     connect(ui->joinButton, &QPushButton::clicked, this, &Bomberman::joinBtnHit);
+    //roomMenu
+    connect(ui->startGameButton, &QPushButton::clicked, this, &Bomberman::startBtnHit);
 
 }
 
@@ -135,13 +145,26 @@ void Bomberman::joinBtnHit()
     {
     QString joinRoom = ui->listRooms->selectedItems().first()->text();
     joinRoom = joinRoom.mid(0,joinRoom.length()-4);
+    ui->labelRoomName2->setText(joinRoom);
     qDebug() << joinRoom << "  joinroom ";
     sendMessage("j" + joinRoom + ";");
     }
 }
 
+void Bomberman::leaveBtnHit()
+{
+    sendMessage("l;");
+    showMenu(ui->onlineMenu, ui->roomMenu);
+}
 
-
+void Bomberman::startBtnHit()
+{
+    qDebug() << ui->labelPlayers->text()[1];
+    if(ui->labelPlayers->text()[1] == '2' || ui->labelPlayers->text()[1] == '3' || ui->labelPlayers->text()[1] == '4')
+    {
+        sendMessage("s;");
+    }
+}
 
 void Bomberman::socketConnected()
 {
@@ -174,6 +197,7 @@ void Bomberman::createRoom()
     {
     sendMessage("c" + maxPlayers + roomName.toUpper() + ";");
     sendMessage("j" + roomName.toUpper() + ";");
+    ui->labelRoomName2->setText(roomName.toUpper());
     }
 }
 
@@ -209,16 +233,134 @@ void Bomberman::socketReadable()
                 QString roomName = it->mid(counter, i-counter);
                 counter = i+1;
                 ui->listRooms->addItem(roomName);
+                if(ui->labelRoomName2->text() == roomName.mid(0, roomName.length()-4))
+                {
+                    ui->labelPlayers->setText(roomName.mid(roomName.length()-4, 4));
+                }
             }
         }
     }
     if((*it)[0] == 'j')
     {
-        qDebug() << "DOLACZYLES DO ROOMU YEAH " << message;
+        showMenu(ui->roomMenu, ui->onlineMenu);
     }
 
+    if((*it)[0] == 's')
+    {
+        showMenu(ui->roomMenu, ui->onlineMenu);
+        playerNumber = (*it)[1].digitValue();
+        game = new Game((*it)[2].digitValue(), ui->centralwidget);
+        game->show();
+    }
     }
     actions.clear();
     actions.shrink_to_fit();
 }
 }
+
+
+
+
+
+
+//sterowanie
+/*
+void Game::keyPressEvent(QKeyEvent *event)
+{
+    switch(event->key())
+    {
+    case Qt::Key_W:
+        (*characters)[0]->setAction(bmb::Animation::UP);
+        break;
+    case Qt::Key_A:
+        (*characters)[0]->setAction(bmb::Animation::LEFT);
+        break;
+    case Qt::Key_S:
+        (*characters)[0]->setAction(bmb::Animation::DOWN);
+        break;
+    case Qt::Key_D:
+        (*characters)[0]->setAction(bmb::Animation::RIGHT);
+        break;
+    case Qt::Key_Y:
+        (*characters)[1]->setAction(bmb::Animation::UP);
+        break;
+    case Qt::Key_G:
+        (*characters)[1]->setAction(bmb::Animation::LEFT);
+        break;
+    case Qt::Key_H:
+        (*characters)[1]->setAction(bmb::Animation::DOWN);
+        break;
+    case Qt::Key_J:
+        (*characters)[1]->setAction(bmb::Animation::RIGHT);
+        break;
+    }
+}
+*/
+/*
+void Game::keyReleaseEvent(QKeyEvent *event)
+{
+    switch(event->key())
+    {
+    case Qt::Key_W:
+        if((*characters)[0]->getAnimation() == bmb::Animation::UP)
+        (*characters)[0]->setAction(bmb::Animation::IDLE_UP);
+        break;
+    case Qt::Key_A:
+        if((*characters)[0]->getAnimation() == bmb::Animation::LEFT)
+        (*characters)[0]->setAction(bmb::Animation::IDLE_LEFT);
+        break;
+    case Qt::Key_S:
+        if((*characters)[0]->getAnimation() == bmb::Animation::DOWN)
+        (*characters)[0]->setAction(bmb::Animation::IDLE_DOWN);
+        break;
+    case Qt::Key_D:
+        if((*characters)[0]->getAnimation() == bmb::Animation::RIGHT)
+        (*characters)[0]->setAction(bmb::Animation::IDLE_RIGHT);
+        break;
+    case Qt::Key_Space:
+        if((*characters)[0]->getBombs()>0)
+        {
+        bmb::Bomb *bomb = new bmb::Bomb(*(*characters)[0], "bomb_sprite", QPointF(-420.69f, -420.69f), QRectF(52.f, 58.f, 22.f, 24.f));
+        bomb->setZValue(5);
+        scene->addItem(bomb);
+        objects->push_back(bomb);
+        }
+        break;
+    case Qt::Key_Y:
+        if((*characters)[1]->getAnimation() == bmb::Animation::UP)
+        (*characters)[1]->setAction(bmb::Animation::IDLE_UP);
+        break;
+    case Qt::Key_G:
+        if((*characters)[1]->getAnimation() == bmb::Animation::LEFT)
+        (*characters)[1]->setAction(bmb::Animation::IDLE_LEFT);
+        break;
+    case Qt::Key_H:
+        if((*characters)[1]->getAnimation() == bmb::Animation::DOWN)
+        (*characters)[1]->setAction(bmb::Animation::IDLE_DOWN);
+        break;
+    case Qt::Key_J:
+        if((*characters)[1]->getAnimation() == bmb::Animation::RIGHT)
+        (*characters)[1]->setAction(bmb::Animation::IDLE_RIGHT);
+        break;
+    case Qt::Key_K:
+        if((*characters)[1]->getBombs()>0)
+        {
+        bmb::Bomb *bomb = new bmb::Bomb(*(*characters)[1], "bomb_sprite", QPointF(-420.69f, -420.69f), QRectF(52.f, 58.f, 22.f, 24.f));
+        bomb->setZValue(5);
+        scene->addItem(bomb);
+        objects->push_back(bomb);
+        }
+        break;
+    }
+}*/
+
+
+
+
+
+
+
+
+
+
+

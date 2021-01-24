@@ -7,7 +7,7 @@ Character::Character(QString name, QPointF pos, QRectF bounds, Object *parent) :
     step = 0;
     bombs = 1;
     speed = QPointF(0.f, 0.f);
-    velocity = 0.15f;
+    velocity = 0.2f;
     score = 0;
 }
 

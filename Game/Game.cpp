@@ -1,39 +1,61 @@
 #include "Game.h"
-Game::Game(QWidget *parent) : QGraphicsView(parent)
+Game::Game(int players, QWidget *parent) : QGraphicsView(parent)
 {
     scene = new QGraphicsScene();
-    scene->setSceneRect(0,0,800,600);
+    scene->setSceneRect(0,0,512,512);
     setScene(scene);
-    setFixedSize(800,600);
+    setFixedSize(512,512);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     //test
     objects = new std::vector<bmb::Object*>();
-
     characters = new std::vector<bmb::Character*>();
-    bmb::Character * character = new bmb::Character("penguin_welder",QPointF(10.f,10.f), QRectF(24.f,52.f,18.f,8.f));
-    character->setZValue(6);
-    bmb::Character * character2 = new bmb::Character("penguin_welder",QPointF(500.f,500.f), QRectF(24.f,52.f,18.f,8.f));
-    character2->setZValue(6);
-    scene->addItem(character);
-    scene->addItem(character2);
-    characters->push_back(character);
-    characters->push_back(character2);
-    objects->push_back(character);
-    objects->push_back(character2);
-    for(int i=1;i<7;i++)
+    for(int i=0;i<players;i++)
     {
-        for(int j=1;j<7;j++)
+        QPointF startPlace(0.0f,0.0f);
+        if(i==0)
+            startPlace = QPointF(15.f, 6.f);
+        if(i==1)
+            startPlace = QPointF(460.f, 6.f);
+        if(i==2)
+            startPlace = QPointF(15.f, 410.f);
+        if(i==3)
+            startPlace = QPointF(460.f, 410.f);
+        bmb::Character * character = new bmb::Character("penguin"+QString::number(i),startPlace,QRectF(24.f,52.f,18.f,8.f));
+        scene->addItem(character);
+        characters->push_back(character);
+        objects->push_back(character);
+        character->setZValue(6);
+    }
+    //wallsy
+    for(int i=0;i<8;i++)
+    {
+        for(int j=0;j<8;j++)
         {
-            bmb::Wall *wall = new bmb::Wall("wall",QPointF(i*68,j*68), QRectF(15.f,15.f,34.f,34.f), false);
+            bmb::Wall *wall = new bmb::Wall("wall",QPointF(i*68-12,j*68-12), QRectF(15.f,15.f,34.f,34.f), false);
             objects->push_back(wall);
-            bmb::Wall *wall2 = new bmb::Wall("wall",QPointF(i*68+34,j*68+34), QRectF(15.f,15.f,34.f,34.f), true);
+            bmb::Wall *wall2 = new bmb::Wall("wall",QPointF(i*68+22,j*68-12), QRectF(15.f,15.f,34.f,34.f), true);
             objects->push_back(wall2);
-            bmb::Wall *wall3 = new bmb::Wall("wall",QPointF(i*68+34,j*68), QRectF(15.f,15.f,34.f,34.f), true);
-            objects->push_back(wall3);
             scene->addItem(wall);
             scene->addItem(wall2);
-            scene->addItem(wall3);
+        }
+    }
+    for(int i=0;i<6;i++)
+    {
+        for(int j=0;j<8;j++)
+        {
+            bmb::Wall *wall2 = new bmb::Wall("wall",QPointF(i*68+22+34,j*68-12+34), QRectF(15.f,15.f,34.f,34.f), true);
+            objects->push_back(wall2);
+            scene->addItem(wall2);
+        }
+    }
+    for(int i=0;i<7;i++)
+    {
+        for(int j=1;j<6;j++)
+        {
+            bmb::Wall *wall2 = new bmb::Wall("wall",QPointF(i*68+22,j*68-12+34), QRectF(15.f,15.f,34.f,34.f), true);
+            objects->push_back(wall2);
+            scene->addItem(wall2);
         }
     }
     timer = new QTimer();
@@ -45,100 +67,7 @@ Game::Game(QWidget *parent) : QGraphicsView(parent)
 }
 
 
-void Game::mousePressEvent(QMouseEvent *ev)
-{
-    ev->pos();
-}
 
-
-void Game::keyPressEvent(QKeyEvent *event)
-{
-    switch(event->key())
-    {
-    case Qt::Key_W:
-        (*characters)[0]->setAction(bmb::Animation::UP);
-        break;
-    case Qt::Key_A:
-        (*characters)[0]->setAction(bmb::Animation::LEFT);
-        break;
-    case Qt::Key_S:
-        (*characters)[0]->setAction(bmb::Animation::DOWN);
-        break;
-    case Qt::Key_D:
-        (*characters)[0]->setAction(bmb::Animation::RIGHT);
-        break;
-    case Qt::Key_Y:
-        (*characters)[1]->setAction(bmb::Animation::UP);
-        break;
-    case Qt::Key_G:
-        (*characters)[1]->setAction(bmb::Animation::LEFT);
-        break;
-    case Qt::Key_H:
-        (*characters)[1]->setAction(bmb::Animation::DOWN);
-        break;
-    case Qt::Key_J:
-        (*characters)[1]->setAction(bmb::Animation::RIGHT);
-        break;
-    }
-}
-
-
-void Game::keyReleaseEvent(QKeyEvent *event)
-{
-    switch(event->key())
-    {
-    case Qt::Key_W:
-        if((*characters)[0]->getAnimation() == bmb::Animation::UP)
-        (*characters)[0]->setAction(bmb::Animation::IDLE_UP);
-        break;
-    case Qt::Key_A:
-        if((*characters)[0]->getAnimation() == bmb::Animation::LEFT)
-        (*characters)[0]->setAction(bmb::Animation::IDLE_LEFT);
-        break;
-    case Qt::Key_S:
-        if((*characters)[0]->getAnimation() == bmb::Animation::DOWN)
-        (*characters)[0]->setAction(bmb::Animation::IDLE_DOWN);
-        break;
-    case Qt::Key_D:
-        if((*characters)[0]->getAnimation() == bmb::Animation::RIGHT)
-        (*characters)[0]->setAction(bmb::Animation::IDLE_RIGHT);
-        break;
-    case Qt::Key_Space:
-        if((*characters)[0]->getBombs()>0)
-        {
-        bmb::Bomb *bomb = new bmb::Bomb(*(*characters)[0], "bomb_sprite", QPointF(-420.69f, -420.69f), QRectF(52.f, 58.f, 22.f, 24.f));
-        bomb->setZValue(5);
-        scene->addItem(bomb);
-        objects->push_back(bomb);
-        }
-        break;
-    case Qt::Key_Y:
-        if((*characters)[1]->getAnimation() == bmb::Animation::UP)
-        (*characters)[1]->setAction(bmb::Animation::IDLE_UP);
-        break;
-    case Qt::Key_G:
-        if((*characters)[1]->getAnimation() == bmb::Animation::LEFT)
-        (*characters)[1]->setAction(bmb::Animation::IDLE_LEFT);
-        break;
-    case Qt::Key_H:
-        if((*characters)[1]->getAnimation() == bmb::Animation::DOWN)
-        (*characters)[1]->setAction(bmb::Animation::IDLE_DOWN);
-        break;
-    case Qt::Key_J:
-        if((*characters)[1]->getAnimation() == bmb::Animation::RIGHT)
-        (*characters)[1]->setAction(bmb::Animation::IDLE_RIGHT);
-        break;
-    case Qt::Key_K:
-        if((*characters)[1]->getBombs()>0)
-        {
-        bmb::Bomb *bomb = new bmb::Bomb(*(*characters)[1], "bomb_sprite", QPointF(-420.69f, -420.69f), QRectF(52.f, 58.f, 22.f, 24.f));
-        bomb->setZValue(5);
-        scene->addItem(bomb);
-        objects->push_back(bomb);
-        }
-        break;
-    }
-}
 
 
 
@@ -219,7 +148,12 @@ bool Game::collision(bmb::Character *character, bmb::Object *object)
     {
         return true;
     }
+    if(right1 + character->getSpeed().x() > 510 || left1 + character->getSpeed().x() < 0 || bottom1 + character->getSpeed().y() > 510 || top1 + character->getSpeed().y() < 10)
+    {
+        return true;
     }
+    }
+
     b = NULL;
     delete b;
     return false;
@@ -258,4 +192,10 @@ bool Game::allCollisions(bmb::Character *character, std::vector<bmb::Object*> * 
         }
     }
     return false;
+}
+
+
+std::vector<bmb::Character*> * Game::getCharacter()
+{
+    return this->characters;
 }

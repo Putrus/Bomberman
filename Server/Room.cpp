@@ -6,6 +6,7 @@ Room::Room(int maxPlayers, char * name)
     this->maxPlayers = maxPlayers;
     memset(this->name, 0, 255);
     strncpy(this->name, name,strlen(name));
+    this->gameIsStarted = false;
 }
 
 
@@ -35,4 +36,29 @@ char  * Room::getName()
 int Room::getMaxPlayers()
 {
     return maxPlayers;
+}
+
+bool Room::ifGameStarted()
+{
+    return gameIsStarted;
+}
+
+bool Room::clientInRoom(Client * client)
+{
+    for(Client * c : clients)
+    {
+        if(c == client)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Room::sendMessage(char * buffer, int count)
+{
+    for(Client * c : clients)
+    {
+        c->write(buffer,count);
+    }
 }

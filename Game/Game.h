@@ -15,7 +15,7 @@
 class Game : public QGraphicsView
 {
 public:
-    Game(QWidget * parent = 0);
+    Game(int players, QWidget * parent = 0);
 private:
     QGraphicsScene *scene;
     QTimer * timer;
@@ -23,15 +23,13 @@ private:
     std::vector<bmb::Object*> * objects;
     std::vector<bmb::Character*> * characters;
 private:
-    void mousePressEvent(QMouseEvent *ev);
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
     void updateGame();
     void updateAnimation();
     bool bombCollision(bmb::Object * object, bmb::Bomb * bomb);
     bool collision(bmb::Character * character, bmb::Object * object);
     bool allBombsCollision(bmb::Object * object, std::vector<bmb::Object*> * objects);
     bool allCollisions(bmb::Character * character, std::vector<bmb::Object*> * objects);
+    std::vector<bmb::Character*> * getCharacter();
 };
 
 #endif // GAME_H

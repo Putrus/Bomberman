@@ -452,7 +452,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Back</string>
+      <string>Disconnect</string>
      </property>
     </widget>
     <widget class="QTextEdit" name="textEditRoomName">
@@ -637,12 +637,98 @@
      </property>
     </widget>
    </widget>
-   <zorder>playMenu</zorder>
+   <widget class="QWidget" name="roomMenu" native="true">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>661</width>
+      <height>541</height>
+     </rect>
+    </property>
+    <widget class="QLabel" name="labelRoomName2">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>-10</y>
+       <width>421</width>
+       <height>121</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>30</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Room</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="startGameButton">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>160</y>
+       <width>341</width>
+       <height>121</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>30</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Start game</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="leaveRoomButton">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>290</y>
+       <width>231</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>20</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Leave room</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelPlayers">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>90</y>
+       <width>191</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>20</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Players</string>
+     </property>
+    </widget>
+   </widget>
    <zorder>menu</zorder>
    <zorder>optionsMenu</zorder>
    <zorder>username</zorder>
    <zorder>connectMenu</zorder>
+   <zorder>playMenu</zorder>
    <zorder>onlineMenu</zorder>
+   <zorder>roomMenu</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

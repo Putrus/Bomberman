@@ -86,7 +86,6 @@ void Server::start()
         
         for(int i=0;i<nActions;i++)
         {
-            std::cout <<i<<" akcja: "<< actions[i]<<std::endl;
         if(strcmp(actions[i], "one") == 0)
         {
             break;
@@ -125,13 +124,11 @@ void Server::start()
             char roomName[255];
             memset(roomName,0,255);
             strncat(roomName, actions[i]+1,strlen(actions[i]));
-            std::cout << "Room name to join: "<<roomName<<std::endl;
             for(Room * room : rooms)
             {
-                std::cout << "Room name: "<< room->getName()<<std::endl;
                 if(strcmp(room->getName(), roomName) == 0)
                 {
-                    std::cout << "Pomyslnie dolaczono klienta do pokoju!"<<std::endl;
+                    std::cout << "Client with fd: "<<client->fd <<  " join room " << room->getName()<<" succesfully!"<<std::endl;
                     if((int)room->getClients().size() < room->getMaxPlayers())
                     {
                         char mess[255];
@@ -140,13 +137,49 @@ void Server::start()
                         client->write(mess, strlen(mess));
                         room->addClient(client);
                         char * roomInfoChar = roomInfo();
+
                         sendToAll(roomInfoChar, strlen(roomInfoChar));
                         memset(mess,0,255);
                     }
                 }
             }
         }
-        
+        if(actions[i][0] == 'l')
+        {
+            Client * client = &(*(Client*)ee.data.ptr);
+            for(Room * room : rooms)
+            {
+                room->deleteClient(client);
+                std::cout<<"Deleted client with fd: " <<client->fd<< " from room " << room->getName()<<std::endl;
+            }
+            char * roomInfoChar = roomInfo();
+            sendToAll(roomInfoChar, strlen(roomInfoChar));
+        }
+        if(actions[i][0] == 's')
+        {
+            Client * client = &(*(Client*)ee.data.ptr);
+            for(Room * room : rooms)
+            {
+                if(room->clientInRoom(client))
+                {
+                    char playerNumber = '0';
+                    char playersNumber = (int)room->getClients().size()+'0';
+                    for(Client * c : room->getClients())
+                    {
+                        char mess[255];
+                        memset(mess,0,255);
+                        strcat(mess, "s");
+                        char tmp[2] = {playerNumber++, playersNumber};
+                        strncat(mess, tmp, 2);
+                        strcat(mess, ";");
+                        std::cout << "Startujemy! "<<mess<<std::endl;
+                        c->write(mess, strlen(mess));
+                    }
+                }
+            }
+            char * roomInfoChar = roomInfo();
+            sendToAll(roomInfoChar, strlen(roomInfoChar));
+        }
         memset(actions[i],0,255);
         }
         memset(handler->buffer,0,255);
