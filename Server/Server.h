@@ -26,7 +26,6 @@ private:
     //to jeszcze do ogarniecia
     std::unordered_set<Client*> clients;
     std::unordered_set<Room*> rooms;
-    char buffer[255];
     char bufferInfo[255];
 public:
     Server(int port);

@@ -131,12 +131,12 @@ void Bomberman::connectBtnHit()
 
 void Bomberman::joinBtnHit()
 {
-
     if(!ui->listRooms->selectedItems().isEmpty())
     {
     QString joinRoom = ui->listRooms->selectedItems().first()->text();
+    joinRoom = joinRoom.mid(0,joinRoom.length()-4);
     qDebug() << joinRoom << "  joinroom ";
-    sendMessage("j" + joinRoom);
+    sendMessage("j" + joinRoom + ";");
     }
 }
 
@@ -163,7 +163,7 @@ void Bomberman::socketDisconnected()
 
 void Bomberman::sendMessage(QString message)
 {
-    sock->write(message.toUtf8());
+    sock->write(message.toUtf8(), message.length());
 }
 
 void Bomberman::createRoom()
@@ -173,6 +173,7 @@ void Bomberman::createRoom()
     if((maxPlayers == "2" || maxPlayers == "3" || maxPlayers == "4") && roomName.length() > 0)
     {
     sendMessage("c" + maxPlayers + roomName.toUpper() + ";");
+    sendMessage("j" + roomName.toUpper() + ";");
     }
 }
 
@@ -183,27 +184,41 @@ void Bomberman::socketReadable()
     QString message = QString(b);
     if(message.length()>0)
     {
-    //r info o pokojach
-
-    if(message[0] == 'r')
+    std::vector<QString> actions;
+    int counter = 0;
+    for(int i=0;i<(int)message.length();i++)
+    {
+        if(message[i] == ';')
+        {
+            QString action = message.mid(counter, i-counter);
+            counter = i+1;
+            actions.push_back(action);
+        }
+    }
+    for(auto it = actions.begin();it!=actions.end();++it)
+    {
+    if((*it)[0] == 'r')
     {
         ui->listRooms->clear();
-        message.remove(0,2);
+        it->remove(0,1);
         int counter = 0;
-        for(int i=0;i<message.length();i++)
+        for(int i=0;i<it->length();i++)
         {
-            if(message[i] == ';')
+            if((*it)[i] == ',')
             {
-                QString roomName = message.mid(counter, i-counter);
+                QString roomName = it->mid(counter, i-counter);
                 counter = i+1;
                 ui->listRooms->addItem(roomName);
             }
         }
     }
-    if(message[0] == 'j')
+    if((*it)[0] == 'j')
     {
         qDebug() << "DOLACZYLES DO ROOMU YEAH " << message;
     }
-    message = "";
+
+    }
+    actions.clear();
+    actions.shrink_to_fit();
 }
 }

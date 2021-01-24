@@ -57,10 +57,10 @@ if(events & EPOLLOUT) {
 if(events & ~(EPOLLIN|EPOLLOUT))
 {   
     
-    strcpy(bufferInfo, "deleteClient");
+    strcpy(bufferInfo, "deleteClient;");
     return bufferInfo;
 }
-    strcpy(bufferInfo,"nothing");
+    strcpy(bufferInfo,"nothing;");
     return bufferInfo;
 }
 

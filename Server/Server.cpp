@@ -37,7 +37,7 @@ Server::Server(int port)
 
     epollFd = epoll_create1(0);
 
-    memset(buffer, 0, 255);
+    memset(bufferInfo, 0, 255);
 }
 
 Server::~Server()
@@ -62,22 +62,51 @@ void Server::start()
             break;
         }
         char * action = (((Handler*)ee.data.ptr)->handleEvent(ee.events));
+        Handler * handler = (Handler*)ee.data.ptr;
         //res == 1 oznacza, ze client sie rozlaczyl. Pozdro
         //tutaj akcje servera
-        if(strcmp(action, "one") == 0)
+        char *temp;
+        char actions[255][255];
+        int restRead = 0;
+        int nActions = 0;
+        for(int i=0;i<(int)strlen(action);i++)
+        {
+            if(action[i] == ';')
+            {
+                restRead = i;
+            }
+        }
+        strncat(handler->buffer, action, restRead);
+        temp = strtok(handler->buffer, ";");
+        while(temp != NULL)
+        {
+            strcpy(actions[nActions++], temp);
+            temp = strtok(NULL, ";");
+        }
+        
+        for(int i=0;i<nActions;i++)
+        {
+            std::cout <<i<<" akcja: "<< actions[i]<<std::endl;
+        if(strcmp(actions[i], "one") == 0)
         {
             break;
         }
-        if(strcmp(action, "deleteClient") == 0)
+        if(strcmp(actions[i], "deleteClient") == 0)
         {
             Client * clientToRemove = &(*(Client*)ee.data.ptr);
+            for(Room * room : rooms)
+            {
+                room->deleteClient(clientToRemove);
+            }
             removeClient(clientToRemove);
+            char * roomInfoChar = roomInfo();
+            sendToAll(roomInfoChar, strlen(roomInfoChar));
         }
-        if(action[0] == 'c')
+        if(actions[i][0] == 'c')
         {
            char roomName[255];
            memset(roomName,0,255);
-           strncat(roomName, action+2,strlen(action)-3);
+           strncat(roomName, actions[i]+2,strlen(action)-2);
            if(!ifRoomNameExists(roomName))
            {
                 Room * room = new Room(action[1]%48, roomName);
@@ -90,29 +119,39 @@ void Server::start()
 
            memset(roomName,0,255);
         }
-        if(action[0] == 'j')
+        if(actions[i][0] == 'j')
         {
             Client * client = &(*(Client*)ee.data.ptr);
             char roomName[255];
             memset(roomName,0,255);
-            strncat(roomName, action+1,strlen(action)-5);
+            strncat(roomName, actions[i]+1,strlen(actions[i]));
             std::cout << "Room name to join: "<<roomName<<std::endl;
             for(Room * room : rooms)
             {
+                std::cout << "Room name: "<< room->getName()<<std::endl;
                 if(strcmp(room->getName(), roomName) == 0)
                 {
+                    std::cout << "Pomyslnie dolaczono klienta do pokoju!"<<std::endl;
                     if((int)room->getClients().size() < room->getMaxPlayers())
                     {
-                        client->write(action, strlen(action) - 3);
+                        char mess[255];
+                        strncat(mess, actions[i], strlen(actions[i]));
+                        strcat(mess,";");
+                        client->write(mess, strlen(mess));
                         room->addClient(client);
                         char * roomInfoChar = roomInfo();
                         sendToAll(roomInfoChar, strlen(roomInfoChar));
+                        memset(mess,0,255);
                     }
                 }
             }
         }
         
-        memset(action, 0, 255);
+        memset(actions[i],0,255);
+        }
+        memset(handler->buffer,0,255);
+        strncat(handler->buffer, action + restRead+1, strlen(action) - restRead);
+        memset(action, 0, strlen(action));
     }
 }
 
@@ -128,7 +167,7 @@ char * Server::handleEvent(uint32_t events)
         if(clientFd == -1)
         {
             error(1, 0, "Accept failed!");
-            strcpy(bufferInfo,"one");
+            strcpy(bufferInfo,"one;");
             return bufferInfo;
         }
 
@@ -136,15 +175,15 @@ char * Server::handleEvent(uint32_t events)
         Client * client = new Client(clientFd, epollFd);
         clients.insert(client);
         char * m = roomInfo();
-        client->write(buffer, strlen(m));
+        client->write(m, strlen(m));
         
     }
     if(events & ~EPOLLIN){
         error(1, 0, "Event %x on server socket", events);
-        strcpy(bufferInfo,"one");
+        strcpy(bufferInfo,"one;");
         return bufferInfo;
     }
-    strcpy(bufferInfo,"newConnection");
+    strcpy(bufferInfo,"newConnection;");
     return bufferInfo;
 }
 
@@ -184,18 +223,19 @@ void Server::removeClient(Client * client)
 
 char * Server::roomInfo()
 {
-    memset(buffer,0,255);
-    strcpy(buffer,"r ");
+    memset(bufferInfo,0,255);
+    strcpy(bufferInfo,"r");
     for(Room * room : rooms)
     {
-        strncat(buffer, room->getName(), strlen(room->getName()));
+        strncat(bufferInfo, room->getName(), strlen(room->getName()));
         char mp = room->getMaxPlayers() + '0';
         char pl = (int)room->getClients().size() + '0';
         char info[4] = {' ',pl,'/', mp};
-        strncat(buffer, info, 4);
-        strcat(buffer, ";\0");
+        strncat(bufferInfo, info, 4);
+        strcat(bufferInfo, ",\0");
     }
-    return buffer;
+    strcat(bufferInfo,";\0");
+    return bufferInfo;
 }
 
 
