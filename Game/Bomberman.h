@@ -29,6 +29,7 @@ private:
     QString username;
     QTcpSocket *sock;
     QTimer * connTimeoutTimer;
+    QTimer * gameEndTimer;
     int playerNumber;
 private:
     void showMenu(QWidget * widgetShow = nullptr, QWidget * widgetHide = nullptr);
@@ -50,6 +51,8 @@ private:
 
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
+
+    void endGame();
 };
 
 #endif // BOMBERMAN_H

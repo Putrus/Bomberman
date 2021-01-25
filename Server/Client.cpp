@@ -8,6 +8,7 @@ Client::Client(int fd, int epollFd)
     this->roomNumber = -1;
     epoll_event ee {EPOLLIN|EPOLLRDHUP,{.ptr=this}};
     epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &ee);
+    memset(bufferInfo,0,255);
 }
 
 

@@ -9,11 +9,12 @@ Bomberman::Bomberman(QWidget *parent) :
     QFontDatabase::addApplicationFont("small_pixel.ttf");
     QFont pixelFont("Small Pixel", QFont::Normal);
     ui->setupUi(this);
-    game = NULL;
+    game = new Game(4, ui->centralwidget);
     ui->centralwidget->setFont(pixelFont);
     setWindowTitle("Bomberman");
     hideAll();
     readUsername();
+
     ui->textEditPort->setText("5000");
     ui->textEditAddress->setText("localhost");
     buttonConnects();
@@ -43,12 +44,8 @@ void Bomberman::hideAll()
     ui->onlineMenu->hide();
     ui->connectMenu->hide();
     ui->roomMenu->hide();
-    if(game!=NULL)
-    {
-        game->hide();
-        delete game;
-        game = NULL;
-    }
+    ui->gameEndMenu->hide();
+    game->hide();
     ui->menu->show();
 
 }
@@ -76,7 +73,12 @@ void Bomberman::buttonConnects()
     connect(ui->joinButton, &QPushButton::clicked, this, &Bomberman::joinBtnHit);
     //roomMenu
     connect(ui->startGameButton, &QPushButton::clicked, this, &Bomberman::startBtnHit);
+    //gameEndMenu
+    connect(ui->backGameEndButton, &QPushButton::clicked, [=](){this->showMenu(ui->onlineMenu, ui->gameEndMenu);});
 
+    gameEndTimer = new QTimer();
+    connect(gameEndTimer, &QTimer::timeout, this, &Bomberman::endGame);
+    gameEndTimer->start(500);
 }
 
 
@@ -146,7 +148,7 @@ void Bomberman::joinBtnHit()
     QString joinRoom = ui->listRooms->selectedItems().first()->text();
     joinRoom = joinRoom.mid(0,joinRoom.length()-4);
     ui->labelRoomName2->setText(joinRoom);
-    qDebug() << joinRoom << "  joinroom ";
+    qDebug() << joinRoom << "  ask join to server!";
     sendMessage("j" + joinRoom + ";");
     }
 }
@@ -249,7 +251,7 @@ void Bomberman::socketReadable()
     {
         showMenu(ui->roomMenu, ui->onlineMenu);
         playerNumber = (*it)[1].digitValue();
-        game = new Game((*it)[2].digitValue(), ui->centralwidget);
+        game->setGame((*it)[2].digitValue());
         game->show();
         ui->roomMenu->hide();
     }
@@ -260,6 +262,8 @@ void Bomberman::socketReadable()
         int k = (*it)[2].digitValue();
         std::vector<bmb::Character*> characters;
         bmb::Character * character = game->getCharacter(k);
+        if(game->isStarted && game->getCharacter(k)->getIsAlive())
+        {
         if(action == 'u')
         {
             character->setAction(bmb::Animation::UP);
@@ -296,12 +300,8 @@ void Bomberman::socketReadable()
         {
             game->createBomb(character);
         }
-
+        }
     }
-
-
-
-
     }
     actions.clear();
     actions.shrink_to_fit();
@@ -316,7 +316,7 @@ void Bomberman::socketReadable()
 //sterowanie
 void Bomberman::keyPressEvent(QKeyEvent *event)
 {
-    if(game != NULL)
+    if(game->isStarted && game->getCharacter(playerNumber)->getIsAlive())
     {
     switch(event->key())
     {
@@ -342,7 +342,7 @@ void Bomberman::keyPressEvent(QKeyEvent *event)
 
 void Bomberman::keyReleaseEvent(QKeyEvent *event)
 {
-    if(game != NULL)
+    if(game->isStarted && game->getCharacter(playerNumber)->getIsAlive())
     {
     bmb::Character * character = game->getCharacter(playerNumber);
     switch(event->key())
@@ -376,6 +376,26 @@ void Bomberman::keyReleaseEvent(QKeyEvent *event)
 
 
 
+void Bomberman::endGame()
+{
+    if(game->isStarted && game->charactersAlive() <= 1)
+    {
+        game->isStarted = false;
+        ui->label_1->setText(QString::number(game->getCharacter(0)->getScore()));
+        ui->label_2->setText(QString::number(game->getCharacter(1)->getScore()));
+        if(game->getCharacter(2) != NULL)
+        ui->label_3->setText(QString::number(game->getCharacter(2)->getScore()));
+        else
+        ui->label_3->setText("NULL");
+        if(game->getCharacter(3) != NULL)
+        ui->label_4->setText(QString::number(game->getCharacter(3)->getScore()));
+        else
+        ui->label_4->setText("NULL");
+        ui->gameEndMenu->show();
+        game->hide();
+        sendMessage("l;");
+    }
+}
 
 
 

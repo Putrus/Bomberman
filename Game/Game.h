@@ -22,6 +22,7 @@ private:
     QTimer * animationTimer;
     std::vector<bmb::Object*> * objects;
     std::vector<bmb::Character*> * characters;
+
 private:
     void updateGame();
     void updateAnimation();
@@ -34,6 +35,9 @@ public:
     std::vector<bmb::Object*> * getObjects();
     QGraphicsScene * getScene();
     void createBomb(bmb::Character * character);
+    int charactersAlive();
+    void setGame(int players);
+    bool isStarted;
 };
 
 #endif // GAME_H

@@ -9,6 +9,7 @@ Character::Character(QString name, QPointF pos, QRectF bounds, Object *parent) :
     speed = QPointF(0.f, 0.f);
     velocity = 0.2f;
     score = 0;
+    isAlive = true;
 }
 
 
@@ -86,10 +87,11 @@ void Character::calcFrame(float frameY, bool idle)
     }
     }
     else{
+        isAlive = false;
         setCurrentFrame(getCurrentFrame().x(), getSpriteSize() * 8);
-        if(getCurrentFrame().x() == getSpriteSize()*2)
+        if(getCurrentFrame().x() == getSpriteSize()*3)
         {
-            setToDeleted(true);
+            //setToDeleted(true);
             return;
         }
         setCurrentFrame(getCurrentFrame().x() + getSpriteSize(), getCurrentFrame().y());
@@ -185,4 +187,14 @@ void Character::setScore(int score)
 void Character::addScore(int add)
 {
     this->score+=add;
+}
+
+bool Character::getIsAlive()
+{
+    return isAlive;
+}
+
+void Character::setIsAlive(bool isAlive)
+{
+    this->isAlive = isAlive;
 }

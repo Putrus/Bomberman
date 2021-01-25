@@ -66,6 +66,10 @@ void Server::start()
         //res == 1 oznacza, ze client sie rozlaczyl. Pozdro
         //tutaj akcje servera
         char *temp;
+        if(action[0]!='o')
+        {
+            std::cout<<action<<std::endl;
+        }
         char actions[255][255];
         int restRead = 0;
         int nActions = 0;
@@ -128,18 +132,20 @@ void Server::start()
             {
                 if(strcmp(room->getName(), roomName) == 0)
                 {
-                    std::cout << "Client with fd: "<<client->fd <<  " join room " << room->getName()<<" succesfully!"<<std::endl;
                     if((int)room->getClients().size() < room->getMaxPlayers())
                     {
                         char mess[255];
                         strncat(mess, actions[i], strlen(actions[i]));
                         strcat(mess,";");
-                        client->write(mess, strlen(mess));
+                        if(client->write(mess, strlen(mess)) == -1)
+                        {
+                            std::cout << "Error! Failed to add client to room!" << std::endl;
+                        }
                         room->addClient(client);
                         char * roomInfoChar = roomInfo();
-
                         sendToAll(roomInfoChar, strlen(roomInfoChar));
                         memset(mess,0,255);
+                        std::cout << "Client with fd: "<<client->fd <<  " join room " << room->getName()<<" succesfully!"<<std::endl;
                     }
                 }
             }
@@ -149,8 +155,11 @@ void Server::start()
             Client * client = &(*(Client*)ee.data.ptr);
             for(Room * room : rooms)
             {
+                if(room->getClients().find(client) != room->getClients().end())
+                {
                 room->deleteClient(client);
                 std::cout<<"Deleted client with fd: " <<client->fd<< " from room " << room->getName()<<std::endl;
+                }
             }
             char * roomInfoChar = roomInfo();
             sendToAll(roomInfoChar, strlen(roomInfoChar));
@@ -158,6 +167,7 @@ void Server::start()
         if(actions[i][0] == 's')
         {
             Client * client = &(*(Client*)ee.data.ptr);
+            char mess[255];
             for(Room * room : rooms)
             {
                 if(room->clientInRoom(client))
@@ -166,7 +176,7 @@ void Server::start()
                     char playersNumber = (int)room->getClients().size()+'0';
                     for(Client * c : room->getClients())
                     {
-                        char mess[255];
+                        
                         memset(mess,0,255);
                         strcat(mess, "s");
                         char tmp[2] = {playerNumber++, playersNumber};
@@ -178,11 +188,15 @@ void Server::start()
                 }
             }
             char * roomInfoChar = roomInfo();
+            memset(roomInfoChar,0,255);
             sendToAll(roomInfoChar, strlen(roomInfoChar));
+            memset(mess,0,255);
         }
         if(actions[i][0] == 'g')
         {
             Client * client = &(*(Client*)ee.data.ptr);
+            char mess[255];
+            //std::cout << client->fd << " " << actions[i]<<std::endl;
             for(Room * room : rooms)
             {
                     if(room->clientInRoom(client))
@@ -191,7 +205,7 @@ void Server::start()
                     {
                         if(room->clientInRoom(c))
                         {
-                        char mess[255];
+                        memset(mess,0,255);
                         strcpy(mess, actions[i]);
                         strcat(mess, ";");
                         c->write(mess, strlen(mess));
@@ -201,12 +215,13 @@ void Server::start()
             }
             char * roomInfoChar = roomInfo();
             sendToAll(roomInfoChar, strlen(roomInfoChar));
+            memset(mess,0,255);
         }
         memset(actions[i],0,255);
         }
         memset(handler->buffer,0,255);
         strncat(handler->buffer, action + restRead+1, strlen(action) - restRead);
-        memset(action, 0, strlen(action));
+        memset(action, 0, 255);
     }
 }
 
@@ -231,6 +246,7 @@ char * Server::handleEvent(uint32_t events)
         clients.insert(client);
         char * m = roomInfo();
         client->write(m, strlen(m));
+        memset(m,0,255);
         
     }
     if(events & ~EPOLLIN){

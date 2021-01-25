@@ -27,6 +27,7 @@ private:
     int bombs;
     //to jeszcze moze do zmienienia i wrzucenia do klasy Player
     int score;
+    bool isAlive;
 private:
     void calcFrame(float frameY, bool idle);
 public:
@@ -50,6 +51,9 @@ public:
     int getScore();
     void setScore(int score);
     void addScore(int add);
+
+    bool getIsAlive();
+    void setIsAlive(bool isAlive);
 
 
 };

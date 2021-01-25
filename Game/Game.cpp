@@ -10,6 +10,7 @@ Game::Game(int players, QWidget *parent) : QGraphicsView(parent)
     //test
     objects = new std::vector<bmb::Object*>();
     characters = new std::vector<bmb::Character*>();
+    isStarted = false;
     for(int i=0;i<players;i++)
     {
         QPointF startPlace(0.0f,0.0f);
@@ -124,7 +125,7 @@ bool Game::bombCollision(bmb::Object *object, bmb::Bomb * bomb)
     if(dis1 <= radius || dis2 <= radius || dis3 <= radius || dis4 <= radius)
     {
         return true;
-    } 
+    }
     }
     return false;
 }
@@ -197,7 +198,11 @@ bool Game::allCollisions(bmb::Character *character, std::vector<bmb::Object*> * 
 
 bmb::Character * Game::getCharacter(int number)
 {
+    if(number < (int)characters->size())
+    {
     return (*this->characters)[number];
+    }
+    return NULL;
 }
 
 
@@ -217,4 +222,77 @@ void Game::createBomb(bmb::Character *character)
     bomb->setZValue(5);
     scene->addItem(bomb);
     objects->push_back(bomb);
+}
+
+
+int Game::charactersAlive()
+{
+    int result = 0;
+    for (auto it = characters->begin(); it != characters->end(); it++) {
+        if((*it)->getIsAlive())
+        {
+            result++;
+        }
+    }
+    return result;
+}
+
+void Game::setGame(int players)
+{
+    scene->clear();
+    objects->clear();
+    objects->shrink_to_fit();
+    characters->clear();
+    characters->shrink_to_fit();
+    for(int i=0;i<players;i++)
+    {
+        QPointF startPlace(0.0f,0.0f);
+        if(i==0)
+            startPlace = QPointF(15.f, 6.f);
+        if(i==1)
+            startPlace = QPointF(460.f, 6.f);
+        if(i==2)
+            startPlace = QPointF(15.f, 410.f);
+        if(i==3)
+            startPlace = QPointF(460.f, 410.f);
+        bmb::Character * character = new bmb::Character("penguin"+QString::number(i),startPlace,QRectF(24.f,52.f,18.f,8.f));
+        scene->addItem(character);
+        characters->push_back(character);
+        objects->push_back(character);
+        character->setZValue(6);
+    }
+    qDebug() << "Pomyslnie utworzono postacie!";
+    //wallsy
+    for(int i=0;i<8;i++)
+    {
+        for(int j=0;j<8;j++)
+        {
+            bmb::Wall *wall = new bmb::Wall("wall",QPointF(i*68-12,j*68-12), QRectF(15.f,15.f,34.f,34.f), false);
+            objects->push_back(wall);
+            bmb::Wall *wall2 = new bmb::Wall("wall",QPointF(i*68+22,j*68-12), QRectF(15.f,15.f,34.f,34.f), true);
+            objects->push_back(wall2);
+            scene->addItem(wall);
+            scene->addItem(wall2);
+        }
+    }
+    for(int i=0;i<6;i++)
+    {
+        for(int j=0;j<8;j++)
+        {
+            bmb::Wall *wall2 = new bmb::Wall("wall",QPointF(i*68+22+34,j*68-12+34), QRectF(15.f,15.f,34.f,34.f), true);
+            objects->push_back(wall2);
+            scene->addItem(wall2);
+        }
+    }
+    for(int i=0;i<7;i++)
+    {
+        for(int j=1;j<6;j++)
+        {
+            bmb::Wall *wall2 = new bmb::Wall("wall",QPointF(i*68+22,j*68-12+34), QRectF(15.f,15.f,34.f,34.f), true);
+            objects->push_back(wall2);
+            scene->addItem(wall2);
+        }
+    }
+
+    isStarted= true;
 }
