@@ -274,21 +274,26 @@ void Bomberman::socketReadable()
         }
         if(game->isStarted && character->getIsAlive())
         {
-        character->setPos(x,y);
+
         if(action == 'u')
         {
+            character->setPos(x,y);
             character->setAction(bmb::Animation::UP);
+
         }
         if(action == 'l')
         {
+            character->setPos(x,y);
             character->setAction(bmb::Animation::LEFT);
         }
         if(action == 'r')
         {
+            character->setPos(x,y);
             character->setAction(bmb::Animation::RIGHT);
         }
         if(action == 'd')
         {
+            character->setPos(x,y);
             character->setAction(bmb::Animation::DOWN);
         }
         if(action == 'y')
@@ -338,18 +343,22 @@ void Bomberman::keyPressEvent(QKeyEvent *event)
     {
     case Qt::Key_W:
         //(*characters)[0]->setAction(bmb::Animation::UP);
+        if(game->getCharacter(playerNumber)->getAnimation() != bmb::Animation::UP)
         sendMessage("gu"+QString::number(playerNumber)+ " " + pos + ";");
         break;
     case Qt::Key_A:
         //(*characters)[0]->setAction(bmb::Animation::LEFT);
+        if(game->getCharacter(playerNumber)->getAnimation() != bmb::Animation::LEFT)
         sendMessage("gl"+QString::number(playerNumber)+ " " + pos + ";");
         break;
     case Qt::Key_S:
         //(*characters)[0]->setAction(bmb::Animation::DOWN);
+        if(game->getCharacter(playerNumber)->getAnimation() != bmb::Animation::DOWN)
         sendMessage("gd"+QString::number(playerNumber)+" " + pos + ";");
         break;
     case Qt::Key_D:
         //(*characters)[0]->setAction(bmb::Animation::RIGHT);
+        if(game->getCharacter(playerNumber)->getAnimation() != bmb::Animation::RIGHT)
         sendMessage("gr"+QString::number(playerNumber)+" " + pos + ";");
         break;
     }
@@ -358,6 +367,11 @@ void Bomberman::keyPressEvent(QKeyEvent *event)
 
 void Bomberman::keyReleaseEvent(QKeyEvent *event)
 {
+    if(event->isAutoRepeat())
+    {
+        event->ignore();
+        return;
+    }
     if(game->isStarted && game->getCharacter(playerNumber)->getIsAlive() && !game->getCharacter(playerNumber)->isDamage)
     {
         QString pos = QString::number(game->getCharacter(playerNumber)->pos().x()) + " " + QString::number(game->getCharacter(playerNumber)->pos().y());
