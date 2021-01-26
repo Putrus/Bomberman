@@ -59,6 +59,7 @@ Game::Game(int players, QWidget *parent) : QGraphicsView(parent)
             scene->addItem(wall2);
         }
     }
+    time = new QTime();
     timer = new QTimer();
     QObject::connect(timer, &QTimer::timeout, this, &Game::updateGame);
     timer->start(1);
@@ -74,6 +75,7 @@ Game::Game(int players, QWidget *parent) : QGraphicsView(parent)
 
 void Game::updateGame()
 {
+    time->start();
     for (auto it = objects->begin(); it != objects->end(); it++) {
         if((*it)[0].getToDeleted() == true)
         {
@@ -98,7 +100,15 @@ void Game::updateGame()
             delete c;
         }
     }
-
+    qDebug() << 20 - time->elapsed();
+    if(20 - time->elapsed() < 0)
+    {
+        timer->start(1);
+    }
+    else
+    {
+        timer->start(qFabs(20 - time->elapsed()));
+    }
 }
 
 

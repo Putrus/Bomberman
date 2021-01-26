@@ -7,7 +7,8 @@
 #include <QDebug>
 #include <QMouseEvent>
 #include <QObject>
-
+#include <QTime>
+#include <QtMath>
 #include "Bomb.h"
 #include "Character.h"
 #include "Wall.h"
@@ -20,6 +21,8 @@ private:
     QGraphicsScene *scene;
     QTimer * timer;
     QTimer * animationTimer;
+    QTime * time;
+    int FPS;
     std::vector<bmb::Object*> * objects;
     std::vector<bmb::Character*> * characters;
 
