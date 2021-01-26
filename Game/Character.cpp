@@ -10,6 +10,7 @@ Character::Character(QString name, QPointF pos, QRectF bounds, Object *parent) :
     velocity = 2.0f;
     score = 0;
     isAlive = true;
+    isDamage = false;
 }
 
 
@@ -127,7 +128,7 @@ void Character::gameUpdate(bool isDamage, bool canMove)
 {
     if(isDamage)
     {
-        setAction(Animation::BREAK);
+        this->isDamage = true;
         return;
     }
     if(canMove)

@@ -222,6 +222,7 @@ void Server::start()
         memset(handler->buffer,0,255);
         strncat(handler->buffer, action + restRead+1, strlen(action) - restRead);
         memset(action, 0, 255);
+        memset(bufferInfo,0,255);
     }
 }
 

@@ -100,7 +100,7 @@ void Game::updateGame()
             delete c;
         }
     }
-    qDebug() << 20 - time->elapsed();
+    //qDebug() << 20 - time->elapsed();
     if(20 - time->elapsed() < 0)
     {
         timer->start(1);
@@ -134,6 +134,7 @@ bool Game::bombCollision(bmb::Object *object, bmb::Bomb * bomb)
     float radius = bomb->getExplosionRadius();
     if(dis1 <= radius || dis2 <= radius || dis3 <= radius || dis4 <= radius)
     {
+        bomb->getCharacter()->addScore(1);
         return true;
     }
     }

@@ -150,29 +150,11 @@
       <string>Online</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="offlineButton">
-     <property name="geometry">
-      <rect>
-       <x>210</x>
-       <y>210</y>
-       <width>151</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>20</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Offline</string>
-     </property>
-    </widget>
     <widget class="QPushButton" name="backPlayButton">
      <property name="geometry">
       <rect>
        <x>210</x>
-       <y>260</y>
+       <y>210</y>
        <width>151</width>
        <height>41</height>
       </rect>
@@ -217,47 +199,11 @@
       <string>Options</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="controlsButton">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>160</y>
-       <width>191</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>20</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Controls</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="otherButton">
-     <property name="geometry">
-      <rect>
-       <x>310</x>
-       <y>210</y>
-       <width>191</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>20</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Other</string>
-     </property>
-    </widget>
     <widget class="QPushButton" name="backOptionsButton">
      <property name="geometry">
       <rect>
        <x>210</x>
-       <y>260</y>
+       <y>180</y>
        <width>151</width>
        <height>41</height>
       </rect>
@@ -809,7 +755,7 @@
     <widget class="QLabel" name="label_1">
      <property name="geometry">
       <rect>
-       <x>50</x>
+       <x>60</x>
        <y>250</y>
        <width>131</width>
        <height>61</height>
@@ -827,8 +773,8 @@
     <widget class="QLabel" name="label_2">
      <property name="geometry">
       <rect>
-       <x>160</x>
-       <y>250</y>
+       <x>240</x>
+       <y>260</y>
        <width>171</width>
        <height>51</height>
       </rect>
@@ -845,8 +791,8 @@
     <widget class="QLabel" name="label_3">
      <property name="geometry">
       <rect>
-       <x>290</x>
-       <y>250</y>
+       <x>410</x>
+       <y>260</y>
        <width>171</width>
        <height>51</height>
       </rect>
@@ -863,8 +809,8 @@
     <widget class="QLabel" name="label_4">
      <property name="geometry">
       <rect>
-       <x>420</x>
-       <y>250</y>
+       <x>580</x>
+       <y>260</y>
        <width>171</width>
        <height>51</height>
       </rect>
@@ -880,13 +826,13 @@
     </widget>
    </widget>
    <zorder>menu</zorder>
-   <zorder>optionsMenu</zorder>
    <zorder>username</zorder>
    <zorder>connectMenu</zorder>
-   <zorder>playMenu</zorder>
    <zorder>onlineMenu</zorder>
    <zorder>roomMenu</zorder>
    <zorder>gameEndMenu</zorder>
+   <zorder>optionsMenu</zorder>
+   <zorder>playMenu</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

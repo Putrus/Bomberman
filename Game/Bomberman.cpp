@@ -262,8 +262,21 @@ void Bomberman::socketReadable()
         int k = (*it)[2].digitValue();
         std::vector<bmb::Character*> characters;
         bmb::Character * character = game->getCharacter(k);
-        if(game->isStarted && game->getCharacter(k)->getIsAlive())
+
+        float x;
+        float y;
+        for(int i=4;i<(int)(*it).length();i++)
         {
+            if((*it)[i] == ' ')
+            {
+                x = (*it).mid(3, i-3).toFloat();
+                y = (*it).mid(i, (*it).length()-i).toFloat();
+                break;
+            }
+        }
+        if(game->isStarted && character->getIsAlive())
+        {
+        character->setPos(x,y);
         if(action == 'u')
         {
             character->setAction(bmb::Animation::UP);
@@ -300,6 +313,10 @@ void Bomberman::socketReadable()
         {
             game->createBomb(character);
         }
+        if(action == 's')
+        {
+            character->setAction(bmb::Animation::BREAK);
+        }
         }
     }
     }
@@ -316,25 +333,26 @@ void Bomberman::socketReadable()
 //sterowanie
 void Bomberman::keyPressEvent(QKeyEvent *event)
 {
-    if(game->isStarted && game->getCharacter(playerNumber)->getIsAlive())
+    if(game->isStarted && game->getCharacter(playerNumber)->getIsAlive() && !game->getCharacter(playerNumber)->isDamage)
     {
+    QString pos = QString::number(game->getCharacter(playerNumber)->pos().x()) + " " + QString::number(game->getCharacter(playerNumber)->pos().y());
     switch(event->key())
     {
     case Qt::Key_W:
         //(*characters)[0]->setAction(bmb::Animation::UP);
-        sendMessage("gu"+QString::number(playerNumber)+";");
+        sendMessage("gu"+QString::number(playerNumber)+ " " + pos + ";");
         break;
     case Qt::Key_A:
         //(*characters)[0]->setAction(bmb::Animation::LEFT);
-        sendMessage("gl"+QString::number(playerNumber)+";");
+        sendMessage("gl"+QString::number(playerNumber)+ " " + pos + ";");
         break;
     case Qt::Key_S:
         //(*characters)[0]->setAction(bmb::Animation::DOWN);
-        sendMessage("gd"+QString::number(playerNumber)+";");
+        sendMessage("gd"+QString::number(playerNumber)+" " + pos + ";");
         break;
     case Qt::Key_D:
         //(*characters)[0]->setAction(bmb::Animation::RIGHT);
-        sendMessage("gr"+QString::number(playerNumber)+";");
+        sendMessage("gr"+QString::number(playerNumber)+" " + pos + ";");
         break;
     }
     }
@@ -342,31 +360,32 @@ void Bomberman::keyPressEvent(QKeyEvent *event)
 
 void Bomberman::keyReleaseEvent(QKeyEvent *event)
 {
-    if(game->isStarted && game->getCharacter(playerNumber)->getIsAlive())
+    if(game->isStarted && game->getCharacter(playerNumber)->getIsAlive() && !game->getCharacter(playerNumber)->isDamage)
     {
+        QString pos = QString::number(game->getCharacter(playerNumber)->pos().x()) + " " + QString::number(game->getCharacter(playerNumber)->pos().y());
     bmb::Character * character = game->getCharacter(playerNumber);
     switch(event->key())
     {
     case Qt::Key_W:
         if(character->getAnimation() == bmb::Animation::UP)
-            sendMessage("gy"+QString::number(playerNumber)+";");
+            sendMessage("gy"+QString::number(playerNumber)+" " + pos + ";");
         break;
     case Qt::Key_A:
         if(character->getAnimation() == bmb::Animation::LEFT)
-            sendMessage("gk"+QString::number(playerNumber)+";");
+            sendMessage("gk"+QString::number(playerNumber)+" " + pos + ";");
         break;
     case Qt::Key_S:
         if(character->getAnimation() == bmb::Animation::DOWN)
-            sendMessage("gc"+QString::number(playerNumber)+";");
+            sendMessage("gc"+QString::number(playerNumber)+" " + pos + ";");
         break;
     case Qt::Key_D:
         if(character->getAnimation() == bmb::Animation::RIGHT)
-            sendMessage("gt"+QString::number(playerNumber)+";");
+            sendMessage("gt"+QString::number(playerNumber)+" " + pos + ";");
         break;
     case Qt::Key_Space:
         if(character->getBombs()>0)
         {
-        sendMessage("gb"+QString::number(playerNumber)+";");
+        sendMessage("gb"+QString::number(playerNumber)+" " + pos + ";");
 
         }
         break;
@@ -394,6 +413,10 @@ void Bomberman::endGame()
         ui->gameEndMenu->show();
         game->hide();
         sendMessage("l;");
+    }
+    if(game->isStarted && game->getCharacter(playerNumber)->isDamage)
+    {
+        sendMessage("gs" + QString::number(playerNumber)+";" );
     }
 }
 

@@ -28,6 +28,7 @@ private:
     //to jeszcze moze do zmienienia i wrzucenia do klasy Player
     int score;
     bool isAlive;
+
 private:
     void calcFrame(float frameY, bool idle);
 public:
@@ -54,7 +55,7 @@ public:
 
     bool getIsAlive();
     void setIsAlive(bool isAlive);
-
+    bool isDamage;
 
 };
 }
