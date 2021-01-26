@@ -66,10 +66,11 @@ void Server::start()
         //res == 1 oznacza, ze client sie rozlaczyl. Pozdro
         //tutaj akcje servera
         char *temp;
-        if(action[0]!='o')
+        
+        /*if(action[0]!='o')
         {
             std::cout<<action<<std::endl;
-        }
+        }*/
         char actions[255][255];
         int restRead = 0;
         int nActions = 0;

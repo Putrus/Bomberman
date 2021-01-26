@@ -148,7 +148,6 @@ void Bomberman::joinBtnHit()
     QString joinRoom = ui->listRooms->selectedItems().first()->text();
     joinRoom = joinRoom.mid(0,joinRoom.length()-4);
     ui->labelRoomName2->setText(joinRoom);
-    qDebug() << joinRoom << "  ask join to server!";
     sendMessage("j" + joinRoom + ";");
     }
 }
@@ -161,7 +160,6 @@ void Bomberman::leaveBtnHit()
 
 void Bomberman::startBtnHit()
 {
-    qDebug() << ui->labelPlayers->text()[1];
     if(ui->labelPlayers->text()[1] == '2' || ui->labelPlayers->text()[1] == '3' || ui->labelPlayers->text()[1] == '4')
     {
         sendMessage("s;");
