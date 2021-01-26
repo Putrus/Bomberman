@@ -749,7 +749,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Player 1   Player 2    Player 3    Player 4</string>
+      <string>Yellow    Blue    Green    Red</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_1">
@@ -830,9 +830,9 @@
    <zorder>connectMenu</zorder>
    <zorder>onlineMenu</zorder>
    <zorder>roomMenu</zorder>
-   <zorder>gameEndMenu</zorder>
    <zorder>optionsMenu</zorder>
    <zorder>playMenu</zorder>
+   <zorder>gameEndMenu</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
