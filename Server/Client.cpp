@@ -9,6 +9,7 @@ Client::Client(int fd, int epollFd)
     epoll_event ee {EPOLLIN|EPOLLRDHUP,{.ptr=this}};
     epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &ee);
     memset(bufferInfo,0,255);
+    this->playerNumber = '0';
 }
 
 
@@ -81,7 +82,7 @@ int Client::write(char * buffer, int count){
     if(sent == -1)
     {
         if(errno != EWOULDBLOCK && errno != EAGAIN){
-            //zwraca 2 czyli client do usuniecia
+            //zwraca -1 czyli klient do usuniecia
             return -1;
         }
         messagesToWrite.emplace_back(buffer, count);

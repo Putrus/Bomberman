@@ -749,7 +749,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Yellow    Blue    Green    Red</string>
+      <string>Yellow           Blue           Green           Red</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_1">

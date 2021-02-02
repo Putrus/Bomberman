@@ -7,5 +7,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     Bomberman * bomberman = new Bomberman();
     bomberman->show();
-return a.exec();
+    int r = a.exec();
+    return r;
 }

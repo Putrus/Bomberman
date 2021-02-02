@@ -9,7 +9,7 @@ Server::Server(int port)
         error(1, 0, "Socket failed!");
     }
     
-    signal(SIGPIPE, SIG_IGN);
+    //signal(SIGPIPE, SIG_IGN);
 
     const int one = 1;
     int res = setsockopt(serverFd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
@@ -42,8 +42,11 @@ Server::Server(int port)
 
 Server::~Server()
 {
+    
     for(Client *client : clients)
         delete client;
+    for(Room * room : rooms)
+        delete room;
     close(serverFd);
     std::cout << "Closing server!\n";
     exit(0);
@@ -63,7 +66,6 @@ void Server::start()
         }
         char * action = (((Handler*)ee.data.ptr)->handleEvent(ee.events));
         Handler * handler = (Handler*)ee.data.ptr;
-        //res == 1 oznacza, ze client sie rozlaczyl. Pozdro
         //tutaj akcje servera
         char *temp;
         /*
@@ -71,6 +73,7 @@ void Server::start()
         {
             std::cout<<action<<std::endl;
         }*/
+        //rozbijam action na poszczegolne akcje
         char actions[255][255];
         int restRead = 0;
         int nActions = 0;
@@ -88,7 +91,7 @@ void Server::start()
             strcpy(actions[nActions++], temp);
             temp = strtok(NULL, ";");
         }
-        
+        //tutaj petle po wszystkich nActions akcjach i sprawdzanie jaka akcje ma wykonac serwer
         for(int i=0;i<nActions;i++)
         {
         if(strcmp(actions[i], "one") == 0)
@@ -100,7 +103,11 @@ void Server::start()
             Client * clientToRemove = &(*(Client*)ee.data.ptr);
             for(Room * room : rooms)
             {
+                if(room->clientInRoom(clientToRemove)){
+                char buff[5] = {'g', 's',clientToRemove->playerNumber,';'};
+                room->sendMessage(buff,5);
                 room->deleteClient(clientToRemove);
+                }
             }
             removeClient(clientToRemove);
             char * roomInfoChar = roomInfo();
@@ -178,12 +185,13 @@ void Server::start()
                     for(Client * c : room->getClients())
                     {
                         
+                        c->playerNumber = playerNumber;
                         memset(mess,0,255);
                         strcat(mess, "s");
                         char tmp[2] = {playerNumber++, playersNumber};
                         strncat(mess, tmp, 2);
                         strcat(mess, ";");
-                        std::cout << "Startujemy! "<<mess<<std::endl;
+                        std::cout << "Game started! "<<mess<<std::endl;
                         c->write(mess, strlen(mess));
                     }
                 }
@@ -310,7 +318,4 @@ char * Server::roomInfo()
     strcat(bufferInfo,";\0");
     return bufferInfo;
 }
-
-
-
 

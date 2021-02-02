@@ -46,13 +46,14 @@ private:
     //getters setters
     void setUsername(QString username);
     void readUsername();
-    void sendMessage(QString message);
     void createRoom();
-
+    void sendMessage(QString message);
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
-
     void endGame();
+public:
+
+    int getPlayerNumber();
 };
 
 #endif // BOMBERMAN_H

@@ -23,6 +23,7 @@ Bomberman::Bomberman(QWidget *parent) :
 
 Bomberman::~Bomberman()
 {
+
     delete ui;
 }
 
@@ -75,7 +76,6 @@ void Bomberman::buttonConnects()
     connect(ui->startGameButton, &QPushButton::clicked, this, &Bomberman::startBtnHit);
     //gameEndMenu
     connect(ui->backGameEndButton, &QPushButton::clicked, [=](){this->showMenu(ui->onlineMenu, ui->gameEndMenu);});
-
     gameEndTimer = new QTimer();
     connect(gameEndTimer, &QTimer::timeout, this, &Bomberman::endGame);
     gameEndTimer->start(500);
@@ -436,6 +436,8 @@ void Bomberman::endGame()
 
 
 
-
+int Bomberman::getPlayerNumber(){
+    return playerNumber;
+}
 
 

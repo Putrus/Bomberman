@@ -15,6 +15,7 @@ public:
     std::list<Message> messagesToWrite;
     void waitForWrite(bool epollout);
     char bufferInfo[255];
+    char playerNumber;
 public:
     Client(int fd, int epollFd);
     virtual ~Client();
